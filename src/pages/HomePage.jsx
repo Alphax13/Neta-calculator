@@ -48,7 +48,7 @@ function HomePage() {
     // Set up interval to restart animations every 5 seconds
     const intervalId = setInterval(() => {
       startAnimationSequence();
-    }, 10000);
+    }, 20000);
     
     // Clean up interval on component unmount
     return () => clearInterval(intervalId);
@@ -216,38 +216,82 @@ function HomePage() {
           คุ้มค่าแค่ไหน
         </Typography>
 
-        {/* Button */}
+        {/* Button with Neon Effect */}
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 6 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCalculatorClick}
+          <Box 
             sx={{
-              borderRadius: 25,
-              px: 15,
-              py: 1.5,
-              fontSize: '2.5rem',
-              fontWeight: 600,
-              textTransform: 'none',
-              display: 'flex',
-              alignItems: 'center',
+              position: 'relative',
               opacity: resetAnimation ? 0 : (buttonFadeIn ? 1 : 0),
               transform: buttonFadeIn ? 'translateY(0)' : 'translateY(30px)',
               transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
-              zIndex: 2,  // Higher than clouds
+              zIndex: 2,
             }}
           >
-            เช็กเลย <img 
-              src="/neta-arrow.svg" 
-              alt="" 
-              style={{ 
-                marginLeft: '10px', 
-                height: '80px',
-                transition: 'transform 0.8s ease-out',
-                transform: resetAnimation ? 'translateX(-20px)' : 'translateX(0)'
-              }} 
-            />
-          </Button>
+            {/* Neon glow effect container */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: -5,
+                left: -5,
+                right: -5,
+                bottom: -5,
+                borderRadius: 30,
+                background: 'transparent',
+                overflow: 'hidden',
+              }}
+            >
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: '4px',
+                  background: 'transparent',
+                  zIndex: 1,
+                  borderRadius: 25,
+                }}
+              />
+              {/* Animated neon border */}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  background: 'conic-gradient(#097969, #50C878, #097969, #50C878, #097969)',
+                  animation: 'animate 4s linear infinite',
+                  zIndex: 0,
+                }}
+              />
+            </Box>
+            
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleCalculatorClick}
+              sx={{
+                position: 'relative',
+                borderRadius: 25,
+                px: 15,
+                py: 1.5,
+                fontSize: '2.5rem',
+                fontWeight: 600,
+                textTransform: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                zIndex: 3,
+                boxShadow: '0 0 30px rgba(0, 204, 255, 0.7)',
+              }}
+            >
+              เช็กเลย <img 
+                src="/neta-arrow.svg" 
+                alt="" 
+                style={{ 
+                  marginLeft: '10px', 
+                  height: '80px',
+                  transition: 'transform 0.8s ease-out',
+                  transform: resetAnimation ? 'translateX(-20px)' : 'translateX(0)'
+                }} 
+              />
+            </Button>
+          </Box>
         </Box>
       </Box>
 
@@ -290,7 +334,9 @@ function HomePage() {
               marginBottom: '20px',
               zIndex: '10',
               transition: 'transform 0.8s ease-out',
-              transform: resetAnimation ? 'translateX(-30px)' : 'translateX(0)'
+              transform: resetAnimation ? 'translateX(-30px)' : 'translateX(0)',
+              animation: 'float 5s ease-in-out infinite',
+              
             }}
           />
 
@@ -310,7 +356,7 @@ function HomePage() {
         </Box>
       </Box>
 
-      {/* Cloud animation keyframes */}
+      {/* Cloud and neon animations keyframes */}
       <style jsx global>{`
         @keyframes float {
           0% { transform: translateY(0px); }
@@ -322,6 +368,11 @@ function HomePage() {
           0% { transform: translateY(0px); }
           50% { transform: translateY(-10px); }
           100% { transform: translateY(0px); }
+        }
+        
+        @keyframes animate {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </Box>
