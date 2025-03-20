@@ -4,7 +4,7 @@ import { Box, Typography, Button } from '@mui/material';
 
 function HomePage() {
   const navigate = useNavigate();
-  
+
   const handleCalculatorClick = () => {
     navigate('/calculator');
   };
@@ -12,7 +12,6 @@ function HomePage() {
   return (
     <Box
       sx={{
-        width: '100vw',
         height: '100vh',
         backgroundImage: `url('/background.png')`,
         backgroundSize: 'cover',
@@ -31,7 +30,7 @@ function HomePage() {
           justifyContent: 'center',
         }}
       >
-        <img src="/neta-logo.png" alt="NETA Logo" style={{ height: '50px' }} />
+        <img src="/neta-logo.png" alt="NETA Logo" style={{ height: '250px' }} />
       </Box>
 
       {/* Thai Text Section */}
@@ -39,6 +38,7 @@ function HomePage() {
         sx={{
           textAlign: 'center',
           mb: 2,
+          flexGrow: 1, // This makes sure the text section grows to fill the available space
         }}
       >
         <Typography
@@ -112,7 +112,7 @@ function HomePage() {
       </Box>
 
       {/* Car Image Section */}
-      <Box sx={{ flex: 1, position: 'relative' }}>
+      <Box sx={{ position: 'relative', flexGrow: 1 }}>
         <Box
           sx={{
             position: 'absolute',
@@ -125,25 +125,25 @@ function HomePage() {
             alignItems: 'center',
           }}
         >
-          <img 
-            src="/charging-station.png" 
-            alt="Charging Station" 
-            style={{ 
-              height: '150px', 
+          <img
+            src="/charging-station.png"
+            alt="Charging Station"
+            style={{
+              height: '150px',
               position: 'absolute',
               left: '10%',
-              bottom: '35%'
-            }} 
+              bottom: '35%',
+            }}
           />
-          
-          <img 
-            src="/neta-car.png" 
-            alt="NETA V-II Electric Car" 
-            style={{ 
-              width: '90%', 
+
+          <img
+            src="/neta-car.png"
+            alt="NETA V-II Electric Car"
+            style={{
+              width: '90%',
               maxWidth: '600px',
-              marginBottom: '80px' 
-            }} 
+              marginBottom: '80px',
+            }}
           />
 
           <Typography
