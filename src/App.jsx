@@ -8,7 +8,7 @@ import ChargingCalculator from './pages/ChargingCalculator';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1a4b9e',
+      main: '#00358C',
     },
     secondary: {
       main: '#ff6600',
