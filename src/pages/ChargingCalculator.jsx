@@ -4,11 +4,10 @@ import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import EvStationIcon from '@mui/icons-material/EvStation';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 
-
 function ChargingCalculator() {
   const carModels = [
-    { model: 'neta-v2', name: 'Neta V II Smart', image: '/neta-car.png', costPerKm: 0.5, gasCostPerKm: 2.0 },
-    { model: 'neta-x', name: 'Neta X 480 Smart', image: '/neta-x.png', costPerKm: 0.7, gasCostPerKm: 2.5 }
+    { model: 'neta-v2', name: 'Neta V II', image: '/neta-car.png', fuelEfficiency: 24.31, electricEfficiency: 18.5, costPerKWh: 4.2, fuelCostPerL: 32.44 }, // เพิ่มราคาน้ำมัน
+    { model: 'neta-x', name: 'Neta X 480', image: '/neta-x.png', fuelEfficiency: 24.31, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 32.44 } // เพิ่มราคาน้ำมัน
   ];
 
   const [carModelIndex, setCarModelIndex] = useState(0);
@@ -32,13 +31,43 @@ function ChargingCalculator() {
     setKilometers(event.target.value);
   };
 
+  // คำนวณค่าน้ำมัน
+  const calculateFuel = (distance, efficiency, costPerL) => {
+    const fuelConsumed = distance / efficiency;
+    return fuelConsumed * costPerL;
+  };
+
+  // คำนวณค่าชาร์จไฟฟ้า
+  const calculateElectricCost = (distance, efficiency, costPerKWh) => {
+    const unitsConsumed = (distance / 100) * efficiency;
+    return unitsConsumed * costPerKWh;
+  };
+
+  // ปัดค่าให้เป็นช่วง
+  const roundToRange = (value, range) => {
+    return `${Math.floor(value / range) * range}-${Math.ceil(value / range) * range}`;
+  };
+
   const handleCalculate = () => {
     const km = parseFloat(kilometers);
     if (!isNaN(km) && km > 0) {
-      // Set charging cost range (50-100 for example)
-      setChargingCost({ min: 50, max: 100 });
-      // Set gas cost range (100-400 for example)
-      setGasCost({ min: 100, max: 400 });
+      // คำนวณค่าน้ำมัน
+      const fuelCost = calculateFuel(km, currentCarModel.fuelEfficiency, currentCarModel.fuelCostPerL);
+
+      // คำนวณค่าชาร์จไฟฟ้า
+      const electricCost = calculateElectricCost(km, currentCarModel.electricEfficiency, currentCarModel.costPerKWh);
+
+      // ตั้งค่าผลลัพธ์ค่าชาร์จไฟฟ้าและค่าน้ำมันเป็นช่วง
+      setChargingCost({
+        min: roundToRange(electricCost, 100).split('-')[0],
+        max: roundToRange(electricCost, 100).split('-')[1]
+      });
+
+      setGasCost({
+        min: roundToRange(fuelCost, 100).split('-')[0],
+        max: roundToRange(fuelCost, 100).split('-')[1]
+      });
+
       setExpanded(true);
       setIsCalculated(true);
     }
@@ -241,7 +270,7 @@ function ChargingCalculator() {
                 </Box>
               </>
             ) : (
-              // Results display section based more exactly on your attached image
+              // Results display section
               <Box sx={{ textAlign: 'center', py: 2 }}>
                 <Typography 
                   sx={{ 
@@ -254,7 +283,7 @@ function ChargingCalculator() {
                 >
                   เลือกรุ่น
                 </Typography>
-                
+
                 <Box 
                   sx={{ 
                     width: '100%', 
@@ -271,7 +300,7 @@ function ChargingCalculator() {
                     {currentCarModel.name}
                   </Typography>
                 </Box>
-                
+
                 <Typography 
                   sx={{ 
                     fontSize: '2rem', 
@@ -283,7 +312,7 @@ function ChargingCalculator() {
                 >
                   ค่าชาร์จไฟ
                 </Typography>
-                
+
                 <Box 
                   sx={{ 
                     width: '90%', 
@@ -324,7 +353,7 @@ function ChargingCalculator() {
                     /บาท
                   </Typography>
                 </Box>
-                
+
                 <Box 
                   sx={{ 
                     width: '90%', 
@@ -365,7 +394,7 @@ function ChargingCalculator() {
                     /บาท
                   </Typography>
                 </Box>
-                
+
                 <Typography 
                   sx={{ 
                     fontSize: '2rem', 
@@ -377,7 +406,7 @@ function ChargingCalculator() {
                 >
                   ระยะทาง
                 </Typography>
-                
+
                 <Box 
                   sx={{ 
                     width: '100%', 
@@ -420,22 +449,10 @@ function ChargingCalculator() {
                     รีเซ็ต <img src="/neta-arrow.svg" alt="NETA" style={{ height: '50px', marginLeft: '8px' }} />
                   </Button>
                 </Box>
-                
-                {/* Disclaimer note */}
-                <Box sx={{ fontSize: '0.75rem', color: '#777', mt: 3, px: 1.5, textAlign: 'left' }}>
-                  <Typography variant="caption" sx={{ display: 'block', mb: 0.5, lineHeight: 1.2 }}>
-                    *คำนวณค่าน้ำมันเทียบจากรถยนต์ XXXCC โดยกรมXXX ขึ้นอยู่กับการขับขี่
-                  </Typography>
-                  <Typography variant="caption" sx={{ display: 'block', lineHeight: 1.2 }}>
-                    *คำนวณค่าไฟฟ้าที่ชาร์จเต็มเฉลี่ย 13KM/100KWH ขึ้นอยู่กับการขับขี่
-                  </Typography>
-                </Box>
               </Box>
             )}
           </Box>
-        </Paper>
-
-        {/* Car Image Section - Takes remaining space */}
+        </Paper>{/* Car Image Section - Takes remaining space */}
         <Box 
           sx={{ 
             flexGrow: 1, 
