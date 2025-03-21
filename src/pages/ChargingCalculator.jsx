@@ -265,7 +265,7 @@ function ChargingCalculator() {
                       textTransform: 'none',
                     }}
                   >
-                    คำนวณ <span style={{ fontSize: '1.8rem', marginLeft: '10px' }}>▼</span>
+                    คำนวณ <img src="/neta-arrow.svg" alt="NETA" style={{ height: '50px', marginLeft: '8px' }} />
                   </Button>
                 </Box>
               </>
