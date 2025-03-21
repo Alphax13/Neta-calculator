@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, Select, MenuItem, FormControl, Paper } from '@mui/material';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
+import EvStationIcon from '@mui/icons-material/EvStation';
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+
 
 function ChargingCalculator() {
   const carModels = [
-    { model: 'neta-v2', name: 'Neta V II Smart', image: '/neta-car.png', costPerKm: 0.5 },
-    { model: 'neta-x', name: 'NETA X - ELECTRIC SUV', image: '/neta-x.png', costPerKm: 0.7 }
+    { model: 'neta-v2', name: 'Neta V II Smart', image: '/neta-car.png', costPerKm: 0.5, gasCostPerKm: 2.0 },
+    { model: 'neta-x', name: 'Neta X 480 Smart', image: '/neta-x.png', costPerKm: 0.7, gasCostPerKm: 2.5 }
   ];
 
   const [carModelIndex, setCarModelIndex] = useState(0);
   const [kilometers, setKilometers] = useState('');
   const [expanded, setExpanded] = useState(false);
-  const [chargingCost, setChargingCost] = useState(0);
-  const [isCalculated, setIsCalculated] = useState(false); // State to track if calculation is done
+  const [chargingCost, setChargingCost] = useState({ min: 0, max: 0 });
+  const [gasCost, setGasCost] = useState({ min: 0, max: 0 });
+  const [isCalculated, setIsCalculated] = useState(false);
 
   const currentCarModel = carModels[carModelIndex];
 
   const handleCarModelChange = (event) => {
-    if (!isCalculated) { // Only allow model change if calculation hasn't been done
+    if (!isCalculated) {
       const selectedModel = event.target.value;
       const selectedIndex = carModels.findIndex(car => car.model === selectedModel);
       setCarModelIndex(selectedIndex);
@@ -29,10 +33,21 @@ function ChargingCalculator() {
   };
 
   const handleCalculate = () => {
-    const calculatedCost = (parseFloat(kilometers) * currentCarModel.costPerKm).toFixed(2);
-    setChargingCost(calculatedCost);
-    setExpanded(true);
-    setIsCalculated(true); // Set the flag to true once calculation is done
+    const km = parseFloat(kilometers);
+    if (!isNaN(km) && km > 0) {
+      // Set charging cost range (50-100 for example)
+      setChargingCost({ min: 50, max: 100 });
+      // Set gas cost range (100-400 for example)
+      setGasCost({ min: 100, max: 400 });
+      setExpanded(true);
+      setIsCalculated(true);
+    }
+  };
+
+  const handleReset = () => {
+    setKilometers('');
+    setExpanded(false);
+    setIsCalculated(false);
   };
 
   const handlePrevCarModel = () => {
@@ -71,8 +86,8 @@ function ChargingCalculator() {
           width: '100%',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, pt: 6 }}>
-          <img src="/neta-logo.png" alt="NETA" style={{ height: '80px' }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, pt: 15 }}>
+          <img src="/neta-logo.png" alt="NETA" style={{ height: '100px' }} />
         </Box>
 
         <Typography
@@ -83,7 +98,7 @@ function ChargingCalculator() {
             color: '#000',
             mb: 4,
             textAlign: 'center',
-            fontSize: { xs: '2.5rem', md: '3.5rem', lg: '4rem' },
+            fontSize: '3rem',
           }}
         >
           ขับเท่านี้ ค่าชาร์จไฟเท่าไหน?
@@ -115,7 +130,7 @@ function ChargingCalculator() {
                     mb: 1,
                     fontWeight: 500,
                     color: '#555',
-                    fontSize: { xs: '1.5rem', md: '1.8rem', lg: '2rem' },
+                    fontSize: '2rem',
                   }}
                 >
                   เลือกรุ่น
@@ -127,14 +142,14 @@ function ChargingCalculator() {
                     onChange={handleCarModelChange}
                     displayEmpty
                     renderValue={currentCarModel.model !== '' ? undefined : () => (
-                      <Box sx={{ display: 'flex', alignItems: 'center', color: '#aaa', fontSize: { xs: '1.2rem', md: '1.5rem', lg: '2rem' } }}>
-                        <span style={{ color: '#ff6600', marginRight: '5px' }}>▼</span>
+                      <Box sx={{ display: 'flex', alignItems: 'center', color: '#aaa', fontSize: '2rem' }}>
+                        <span style={{ color: '#EAB142', marginRight: '5px' }}>▼</span>
                         <span>กรุณาเลือกรุ่น</span>
                       </Box>
                     )}
                     sx={{
                       borderRadius: 1,
-                      height: '70px',
+                      height: '100px',
                       '& .MuiOutlinedInput-notchedOutline': {
                         borderColor: '#ddd',
                       },
@@ -142,11 +157,11 @@ function ChargingCalculator() {
                         padding: '15px',
                       },
                     }}
-                    disabled={isCalculated} // Disable car selection after calculation
+                    disabled={isCalculated}
                   >
                     {carModels.map((car, index) => (
                       <MenuItem key={car.model} value={car.model}>
-                        <Typography sx={{ fontWeight: 500, color: '#333', fontSize: { xs: '1.2rem', md: '1.5rem', lg: '1.8rem' } }}>
+                        <Typography sx={{ fontWeight: 500, color: '#333', fontSize: '2.5rem' }}>
                           {car.name}
                         </Typography>
                       </MenuItem>
@@ -176,9 +191,9 @@ function ChargingCalculator() {
                   sx={{
                     mb: 4,
                     '& .MuiOutlinedInput-root': {
-                      height: '70px',
+                      height: '100px',
                       borderRadius: 1,
-                      fontSize: { xs: '1.2rem', md: '1.5rem', lg: '1.8rem' },
+                      fontSize: '2.5rem',
                       '& fieldset': {
                         borderColor: '#ddd',
                       },
@@ -193,7 +208,7 @@ function ChargingCalculator() {
                         variant="body2" 
                         color="textSecondary"
                         sx={{ 
-                          fontSize: { xs: '1rem', md: '1.2rem', lg: '1.4rem' }
+                          fontSize: '2rem',
                         }}
                       >
                         กิโลเมตร
@@ -216,7 +231,7 @@ function ChargingCalculator() {
                         backgroundColor: '#002d63',
                       },
                       width: '80%',
-                      fontSize: { xs: '1.2rem', md: '1.4rem', lg: '1.6rem' },
+                      fontSize: '2rem',
                       fontWeight: 500,
                       textTransform: 'none',
                     }}
@@ -226,16 +241,193 @@ function ChargingCalculator() {
                 </Box>
               </>
             ) : (
-              <Box sx={{ textAlign: 'center', mb: 2 }}>
-                <Typography sx={{ fontSize: '1.5rem', fontWeight: 500 }}>
-                  ค่าไฟที่ต้องชาร์จ (ต่อวัน):
+              // Results display section based more exactly on your attached image
+              <Box sx={{ textAlign: 'center', py: 2 }}>
+                <Typography 
+                  sx={{ 
+                    fontSize: '2rem', 
+                    fontWeight: 500, 
+                    mb: 2,
+                    textAlign: 'left',
+                    px: 2
+                  }}
+                >
+                  เลือกรุ่น
                 </Typography>
-                <Box sx={{ textAlign: 'center', mb: 2 }}>
-                  <Typography sx={{ fontSize: '1.5rem', fontWeight: 500, color: '#2c7c2b' }}>
-                    ค่าชาร์จไฟ: ฿{chargingCost.min} - ฿{chargingCost.max}
+                
+                <Box 
+                  sx={{ 
+                    width: '100%', 
+                    height: '100px',
+                    borderRadius: 1,
+                    border: '1px solid #ddd',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mb: 3
+                  }}
+                >
+                  <Typography sx={{ fontSize: '2.5rem' }}>
+                    {currentCarModel.name}
                   </Typography>
-                  <Typography sx={{ fontSize: '1.5rem', fontWeight: 500, color: '#b31a1a' }}>
-                    ค่าน้ำมัน: ฿{chargingCost.min} - ฿{chargingCost.max}
+                </Box>
+                
+                <Typography 
+                  sx={{ 
+                    fontSize: '2rem', 
+                    fontWeight: 500,
+                    mb: 2,
+                    textAlign: 'left',
+                    px: 2
+                  }}
+                >
+                  ค่าชาร์จไฟ
+                </Typography>
+                
+                <Box 
+                  sx={{ 
+                    width: '90%', 
+                    height: '100px',
+                    borderRadius: 1,
+                    border: '1px solid #ddd',
+                    display: 'flex',
+                    alignItems: 'center',
+                    px: 4,
+                    mb: 3,
+                    backgroundColor: '#f8f8f8'
+                  }}
+                >
+                  <EvStationIcon 
+                    sx={{ 
+                      color: '#7ab8db', 
+                      fontSize: '3rem',
+                      mr: 2
+                    }} 
+                  />
+                  <Typography sx={{ fontSize: '2rem', mr: 2 }}>
+                    ค่าชาร์จไฟ
+                  </Typography>
+                  <Typography 
+                    sx={{ 
+                      fontSize: '3rem', 
+                      fontWeight: 600, 
+                      color: '#4caf50',
+                      ml: 'auto',
+                      mr: 1,
+                      flex: 1,
+                      textAlign: 'right'
+                    }}
+                  >
+                    {chargingCost.min}-{chargingCost.max}
+                  </Typography>
+                  <Typography sx={{ fontSize: '2rem', whiteSpace: 'nowrap' }}>
+                    /บาท
+                  </Typography>
+                </Box>
+                
+                <Box 
+                  sx={{ 
+                    width: '90%', 
+                    height: '100px',
+                    borderRadius: 1,
+                    border: '1px solid #ddd',
+                    display: 'flex',
+                    alignItems: 'center',
+                    px: 4,
+                    mb: 3,
+                    backgroundColor: '#f8f8f8'
+                  }}
+                >
+                  <LocalGasStationIcon 
+                    sx={{ 
+                      color: '#7ab8db', 
+                      fontSize: '3rem',
+                      mr: 2
+                    }} 
+                  />
+                  <Typography sx={{ fontSize: '2rem', mr: 2 }}>
+                    ค่าน้ำมัน
+                  </Typography>
+                  <Typography 
+                    sx={{ 
+                      fontSize: '3rem',  
+                      fontWeight: 600, 
+                      color: '#f44336',
+                      ml: 'auto',
+                      mr: 1,
+                      flex: 1,
+                      textAlign: 'right'
+                    }}
+                  >
+                    {gasCost.min}-{gasCost.max}
+                  </Typography>
+                  <Typography sx={{ fontSize: '2rem', whiteSpace: 'nowrap' }}>
+                    /บาท
+                  </Typography>
+                </Box>
+                
+                <Typography 
+                  sx={{ 
+                    fontSize: '2rem', 
+                    fontWeight: 500,
+                    mb: 2,
+                    textAlign: 'left',
+                    px: 2
+                  }}
+                >
+                  ระยะทาง
+                </Typography>
+                
+                <Box 
+                  sx={{ 
+                    width: '100%', 
+                    height: '100px',
+                    borderRadius: 1,
+                    border: '1px solid #ddd',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mb: 4
+                  }}
+                >
+                  <Typography sx={{ fontSize: '3rem' }}>
+                    {kilometers} กิโลเมตร
+                  </Typography>
+                </Box>
+
+                {/* Reset Button */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                  <Button
+                    variant="contained"
+                    onClick={handleReset}
+                    sx={{
+                      borderRadius: 25,
+                      px: 6,
+                      py: 1.5,
+                      backgroundColor: '#003f88',
+                      '&:hover': {
+                        backgroundColor: '#002d63',
+                      },
+                      width: '80%',
+                      fontSize: '2rem',
+                      fontWeight: 500,
+                      textTransform: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    รีเซ็ต <img src="/neta-arrow.svg" alt="NETA" style={{ height: '50px', marginLeft: '8px' }} />
+                  </Button>
+                </Box>
+                
+                {/* Disclaimer note */}
+                <Box sx={{ fontSize: '0.75rem', color: '#777', mt: 3, px: 1.5, textAlign: 'left' }}>
+                  <Typography variant="caption" sx={{ display: 'block', mb: 0.5, lineHeight: 1.2 }}>
+                    *คำนวณค่าน้ำมันเทียบจากรถยนต์ XXXCC โดยกรมXXX ขึ้นอยู่กับการขับขี่
+                  </Typography>
+                  <Typography variant="caption" sx={{ display: 'block', lineHeight: 1.2 }}>
+                    *คำนวณค่าไฟฟ้าที่ชาร์จเต็มเฉลี่ย 13KM/100KWH ขึ้นอยู่กับการขับขี่
                   </Typography>
                 </Box>
               </Box>
@@ -243,8 +435,8 @@ function ChargingCalculator() {
           </Box>
         </Paper>
 
- {/* Car Image Section - Takes remaining space */}
- <Box 
+        {/* Car Image Section - Takes remaining space */}
+        <Box 
           sx={{ 
             flexGrow: 1, 
             width: '100%',
@@ -261,7 +453,6 @@ function ChargingCalculator() {
             sx={{
               position: 'relative',
               width: '100%',
-              backgroundColor: 'rgba(173, 216, 230, 0.3)',
               borderRadius: 8,
               pt: 2,
               pb: 1,
@@ -293,60 +484,66 @@ function ChargingCalculator() {
               }}
             />
             
-            {/* Navigation Buttons */}
-            <Box sx={{ position: 'absolute', bottom: '50%', left: '5%', transform: 'translateY(50%)' }}>
-              <Button
-                onClick={handlePrevCarModel}
-                sx={{
-                  minWidth: 'unset',
-                  width: { xs: '50px', md: '60px' },
-                  height: { xs: '50px', md: '60px' },
-                  p: 0,
-                  borderRadius: '50%',
-                  backgroundColor: '#ff6600',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: '#e55c00',
-                  },
-                }}
-              >
-                <ArrowBack sx={{ fontSize: { xs: '1.5rem', md: '2rem' } }} />
-              </Button>
-            </Box>
-            
-            <Box sx={{ position: 'absolute', bottom: '50%', right: '5%', transform: 'translateY(50%)' }}>
-              <Button
-                onClick={handleNextCarModel}
-                sx={{
-                  minWidth: 'unset',
-                  width: { xs: '50px', md: '60px' },
-                  height: { xs: '50px', md: '60px' },
-                  p: 0,
-                  borderRadius: '50%',
-                  backgroundColor: '#ff6600',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: '#e55c00',
-                  },
-                }}
-              >
-                <ArrowForward sx={{ fontSize: { xs: '1.5rem', md: '2rem' } }} />
-              </Button>
-            </Box>
+            {/* Navigation Buttons - Only show when not in result mode */}
+            {!isCalculated && (
+              <>
+                <Box sx={{ position: 'absolute', bottom: '50%', left: '5%', transform: 'translateY(50%)' }}>
+                  <Button
+                    onClick={handlePrevCarModel}
+                    sx={{
+                      minWidth: 'unset',
+                      width: { xs: '50px', md: '60px' },
+                      height: { xs: '50px', md: '60px' },
+                      p: 0,
+                      borderRadius: '50%',
+                      backgroundColor: '#EAB142',
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: '#e55c00',
+                      },
+                    }}
+                  >
+                    <ArrowBack sx={{ fontSize: { xs: '1.5rem', md: '2rem' } }} />
+                  </Button>
+                </Box>
+                
+                <Box sx={{ position: 'absolute', bottom: '50%', right: '5%', transform: 'translateY(50%)' }}>
+                  <Button
+                    onClick={handleNextCarModel}
+                    sx={{
+                      minWidth: 'unset',
+                      width: { xs: '50px', md: '60px' },
+                      height: { xs: '50px', md: '60px' },
+                      p: 0,
+                      borderRadius: '50%',
+                      backgroundColor: '#EAB142',
+                      color: 'white',
+                      '&:hover': {
+                        backgroundColor: '#e55c00',
+                      },
+                    }}
+                  >
+                    <ArrowForward sx={{ fontSize: { xs: '1.5rem', md: '2rem' } }} />
+                  </Button>
+                </Box>
+              </>
+            )}
           </Box>
           
-          <Typography
-            variant="body2"
-            sx={{
-              mt: 2,
-              color: '#333',
-              fontWeight: 500,
-              fontSize: { xs: '0.9rem', md: '1.1rem', lg: '1.3rem' },
-              textAlign: 'center',
-            }}
-          >
-            หมุนเลือกรุ่น NETA ที่ต้องการ
-          </Typography>
+          {!isCalculated && (
+            <Typography
+              variant="body2"
+              sx={{
+                mt: 2,
+                color: '#333',
+                fontWeight: 500,
+                fontSize: { xs: '0.9rem', md: '1.1rem', lg: '1.3rem' },
+                textAlign: 'center',
+              }}
+            >
+              หมุนเลือกรุ่น NETA ที่ต้องการ
+            </Typography>
+          )}
         </Box>
       </Box>
     </Box>
