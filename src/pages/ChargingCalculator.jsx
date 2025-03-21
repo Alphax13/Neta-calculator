@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, Select, MenuItem, FormControl, Paper } from '@mui/material';
-import { ArrowBack, ArrowForward } from '@mui/icons-material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, TextField, Button, Select, MenuItem, FormControl, Paper, IconButton } from '@mui/material';
+import { ArrowBack, ArrowForward, KeyboardBackspace } from '@mui/icons-material';
 import EvStationIcon from '@mui/icons-material/EvStation';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function ChargingCalculator() {
   const carModels = [
-    { model: 'neta-v2', name: 'Neta V II', image: '/neta-car.png', fuelEfficiency: 24.31, electricEfficiency: 18.5, costPerKWh: 4.2, fuelCostPerL: 34.28 }, // เพิ่มราคาน้ำมัน
-    { model: 'neta-x', name: 'Neta X 480', image: '/neta-x.png', fuelEfficiency: 24.31, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 34.28 } // เพิ่มราคาน้ำมัน
+    { model: 'neta-v2', name: 'Neta V II', image: '/neta-car.png', fuelEfficiency: 19.5, electricEfficiency: 18.5, costPerKWh: 4.2, fuelCostPerL: 34.28 },
+    { model: 'neta-x', name: 'Neta X 480', image: '/neta-x.png', fuelEfficiency: 19.5, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 34.28 }
   ];
 
   const [carModelIndex, setCarModelIndex] = useState(0);
@@ -16,34 +17,73 @@ function ChargingCalculator() {
   const [chargingCost, setChargingCost] = useState({ min: 0, max: 0 });
   const [gasCost, setGasCost] = useState({ min: 0, max: 0 });
   const [isCalculated, setIsCalculated] = useState(false);
+  const [slideDirection, setSlideDirection] = useState(0); // -1 for left, 1 for right, 0 for initial
 
   const currentCarModel = carModels[carModelIndex];
+
+  // Handle touch events for car swiping
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  // Required minimum swipe distance in pixels
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    if (isCalculated) return;
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    if (isCalculated) return;
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd || isCalculated) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe) {
+      handleNextCarModel();
+    } else if (isRightSwipe) {
+      handlePrevCarModel();
+    }
+  };
 
   const handleCarModelChange = (event) => {
     if (!isCalculated) {
       const selectedModel = event.target.value;
       const selectedIndex = carModels.findIndex(car => car.model === selectedModel);
+      const direction = selectedIndex > carModelIndex ? 1 : -1;
+      setSlideDirection(direction);
       setCarModelIndex(selectedIndex);
     }
   };
 
   const handleKilometersChange = (event) => {
-    setKilometers(event.target.value);
+    // Only allow numeric input
+    const value = event.target.value;
+    if (value === '' || /^[0-9]+$/.test(value)) {
+      setKilometers(value);
+    }
   };
 
-  // คำนวณค่าน้ำมัน
+  // Calculate fuel cost
   const calculateFuel = (distance, efficiency, costPerL) => {
     const fuelConsumed = distance / efficiency;
     return fuelConsumed * costPerL;
   };
 
-  // คำนวณค่าชาร์จไฟฟ้า
+  // Calculate electric charging cost
   const calculateElectricCost = (distance, efficiency, costPerKWh) => {
     const unitsConsumed = (distance / 100) * efficiency;
     return unitsConsumed * costPerKWh;
   };
 
-  // ปัดค่าให้เป็นช่วง
+  // Round to range
   const roundToRange = (value, range) => {
     return `${Math.floor(value / range) * range}-${Math.ceil(value / range) * range}`;
   };
@@ -51,13 +91,13 @@ function ChargingCalculator() {
   const handleCalculate = () => {
     const km = parseFloat(kilometers);
     if (!isNaN(km) && km > 0) {
-      // คำนวณค่าน้ำมัน
+      // Calculate fuel cost
       const fuelCost = calculateFuel(km, currentCarModel.fuelEfficiency, currentCarModel.fuelCostPerL);
 
-      // คำนวณค่าชาร์จไฟฟ้า
+      // Calculate electric charging cost
       const electricCost = calculateElectricCost(km, currentCarModel.electricEfficiency, currentCarModel.costPerKWh);
 
-      // ตั้งค่าผลลัพธ์ค่าชาร์จไฟฟ้าและค่าน้ำมันเป็นช่วง
+      // Set charging and gas cost ranges
       setChargingCost({
         min: roundToRange(electricCost, 100).split('-')[0],
         max: roundToRange(electricCost, 100).split('-')[1]
@@ -81,14 +121,55 @@ function ChargingCalculator() {
 
   const handlePrevCarModel = () => {
     if (!isCalculated) {
+      setSlideDirection(-1);
       setCarModelIndex((prevIndex) => (prevIndex - 1 + carModels.length) % carModels.length);
     }
   };
 
   const handleNextCarModel = () => {
     if (!isCalculated) {
+      setSlideDirection(1);
       setCarModelIndex((prevIndex) => (prevIndex + 1) % carModels.length);
     }
+  };
+
+  // Handler for back button click
+  const handleBackClick = () => {
+    window.location.href = '/';
+  };
+
+  // Variants for the car image animation
+  const carVariants = {
+    enter: (direction) => ({
+      x: direction > 0 ? 300 : -300,
+      y: 100,
+      opacity: 0,
+      scale: 0.8,
+    }),
+    center: {
+      x: 0,
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        x: { type: 'spring', stiffness: 300, damping: 25 },
+        y: { type: 'spring', stiffness: 300, damping: 25 },
+        opacity: { duration: 0.3 },
+        scale: { duration: 0.3 }
+      }
+    },
+    exit: (direction) => ({
+      x: direction < 0 ? 300 : -300,
+      y: 100,
+      opacity: 0,
+      scale: 0.8,
+      transition: {
+        x: { type: 'spring', stiffness: 300, damping: 25 },
+        y: { type: 'spring', stiffness: 300, damping: 25 },
+        opacity: { duration: 0.3 },
+        scale: { duration: 0.3 }
+      }
+    })
   };
 
   return (
@@ -104,6 +185,25 @@ function ChargingCalculator() {
         position: 'relative',
       }}
     >
+      {/* Back Button */}
+      <IconButton
+        onClick={handleBackClick}
+        sx={{
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 1)',
+          },
+          zIndex: 10,
+        }}
+        aria-label="back to homepage"
+      >
+        <KeyboardBackspace sx={{ fontSize: '2rem', color: '#003f88' }} />
+      </IconButton>
+
       <Box
         sx={{
           display: 'flex',
@@ -115,7 +215,17 @@ function ChargingCalculator() {
           width: '100%',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, pt: 15 }}>
+        {/* Clickable Logo */}
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            mb: 2, 
+            pt: 15,
+            cursor: 'pointer',
+          }}
+          onClick={() => window.open('https://www.neta.co.th/th', '_blank')}
+        >
           <img src="/neta-logo.png" alt="NETA" style={{ height: '100px' }} />
         </Box>
 
@@ -198,7 +308,7 @@ function ChargingCalculator() {
                   </Select>
                 </FormControl>
 
-                {/* Kilometers Input */}
+                {/* Kilometers Input - Only allow numbers */}
                 <Typography
                   variant="body1"
                   sx={{
@@ -217,6 +327,11 @@ function ChargingCalculator() {
                   value={kilometers}
                   onChange={handleKilometersChange}
                   placeholder="กิโลเมตร"
+                  type="text"
+                  inputProps={{
+                    inputMode: 'numeric',
+                    pattern: '[0-9]*'
+                  }}
                   sx={{
                     mb: 4,
                     '& .MuiOutlinedInput-root': {
@@ -452,7 +567,7 @@ function ChargingCalculator() {
               </Box>
             )}
           </Box>
-        </Paper>{/* Car Image Section - Takes remaining space */}
+        </Paper>{/* Car Image Section with Animation */}
         <Box 
           sx={{ 
             flexGrow: 1, 
@@ -465,6 +580,9 @@ function ChargingCalculator() {
             position: 'relative',
             mb: 4,
           }}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
         >
           <Box
             sx={{
@@ -491,15 +609,32 @@ function ChargingCalculator() {
               {currentCarModel.name}
             </Typography>
             
-            <img
-              src={currentCarModel.image}
-              alt={currentCarModel.name}
-              style={{
-                width: '100%',
-                maxWidth: '800px',
-                marginBottom: '20px',
-              }}
-            />
+            {/* Animated Car Image */}
+            <AnimatePresence initial={false} custom={slideDirection} mode="wait">
+              <motion.div
+                key={carModelIndex}
+                custom={slideDirection}
+                variants={carVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'center'
+                }}
+              >
+                <img
+                  src={currentCarModel.image}
+                  alt={currentCarModel.name}
+                  style={{
+                    width: '100%',
+                    maxWidth: '800px',
+                    marginBottom: '20px',
+                  }}
+                />
+              </motion.div>
+            </AnimatePresence>
             
             {/* Navigation Buttons - Only show when not in result mode */}
             {!isCalculated && (

@@ -139,6 +139,7 @@ function HomePage() {
             transition: 'transform 0.8s ease-out',
             transform: resetAnimation ? 'scale(0.9)' : 'scale(1)'
           }} 
+          onClick={() => window.open('https://www.neta.co.th/th', '_blank')}
         />
       </Box>
 
