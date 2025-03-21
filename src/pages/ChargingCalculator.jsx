@@ -6,8 +6,8 @@ import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 
 function ChargingCalculator() {
   const carModels = [
-    { model: 'neta-v2', name: 'Neta V II', image: '/neta-car.png', fuelEfficiency: 24.31, electricEfficiency: 18.5, costPerKWh: 4.2, fuelCostPerL: 32.44 }, // เพิ่มราคาน้ำมัน
-    { model: 'neta-x', name: 'Neta X 480', image: '/neta-x.png', fuelEfficiency: 24.31, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 32.44 } // เพิ่มราคาน้ำมัน
+    { model: 'neta-v2', name: 'Neta V II', image: '/neta-car.png', fuelEfficiency: 24.31, electricEfficiency: 18.5, costPerKWh: 4.2, fuelCostPerL: 34.28 }, // เพิ่มราคาน้ำมัน
+    { model: 'neta-x', name: 'Neta X 480', image: '/neta-x.png', fuelEfficiency: 24.31, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 34.28 } // เพิ่มราคาน้ำมัน
   ];
 
   const [carModelIndex, setCarModelIndex] = useState(0);
