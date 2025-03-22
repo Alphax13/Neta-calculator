@@ -12,9 +12,9 @@ function ChargingCalculator() {
   ];
 
   // ตรวจสอบขนาดหน้าจอสำหรับการแสดงผลแบบ Responsive
-  const isMobile = useMediaQuery('(max-width:600px)');
-  const isTablet = useMediaQuery('(max-width:960px)');
-  const isLandscape = useMediaQuery('(orientation: landscape)');
+  const isMobile = useMediaQuery('(max-width:600px)');  // สำหรับมือถือ
+  const isTablet = useMediaQuery('(max-width:960px)');  // สำหรับแท็บเล็ต
+  const isLandscape = useMediaQuery('(orientation: landscape)');  // สำหรับแนวนอน
   
   const [carModelIndex, setCarModelIndex] = useState(0);
   const [kilometers, setKilometers] = useState('');
@@ -311,7 +311,7 @@ function ChargingCalculator() {
                     )}
                     sx={{
                       borderRadius: 1,
-                      height: isMobile ? '20px' : '100px',
+                      height: isMobile ? '40px' : '100px',
                       '& .MuiOutlinedInput-notchedOutline': {
                         borderColor: '#ddd',
                       },
