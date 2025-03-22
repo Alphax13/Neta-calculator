@@ -265,10 +265,10 @@ function ChargingCalculator() {
         <Paper
           elevation={3}
           sx={{
+            height: 'auto', // Changed from '100%' to 'auto'
             width: '80%',
             maxWidth: '800px',
             borderRadius: 4,
-            overflow: 'hidden',
             mb: isMobile ? 2 : 4,
           }}
         >
@@ -428,7 +428,6 @@ function ChargingCalculator() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 mb: isMobile ? 1 : 3,
-                overflowY: 'auto',  // เพิ่มการเลื่อนแนวนอน
               }}
             >
               <Typography sx={{ 
@@ -463,7 +462,6 @@ function ChargingCalculator() {
                 mb: isMobile ? 1 : 3,
                 backgroundColor: '#f8f8f8',
                 mx: 'auto',
-                overflowY: 'auto',  // เพิ่มการเลื่อนแนวนอน
               }}
             >
               <EvStationIcon 
@@ -516,7 +514,7 @@ function ChargingCalculator() {
                 mb: isMobile ? 1 : 3,
                 backgroundColor: '#f8f8f8',
                 mx: 'auto',
-                overflowY: 'auto',  // เพิ่มการเลื่อนแนวนอน
+              
               }}
             >
               <LocalGasStationIcon 
@@ -579,7 +577,6 @@ function ChargingCalculator() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 mb: isMobile ? 1 : 4,
-                overflowY: 'auto',  // เพิ่มการเลื่อนแนวนอน
               }}
             >
               <Typography sx={{ 
@@ -595,7 +592,6 @@ function ChargingCalculator() {
               display: 'flex', 
               justifyContent: 'center', 
               mt: 2,
-              overflowY: 'auto',  // เพิ่มการเลื่อนสำหรับส่วนของปุ่ม
               width: '100%'
             }}>
               <Button
