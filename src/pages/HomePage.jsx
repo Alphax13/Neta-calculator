@@ -15,11 +15,20 @@ function HomePage() {
   const [carFadeIn, setCarFadeIn] = useState(false);
   const [cloudsFadeIn, setCloudsFadeIn] = useState(false);
   const [resetAnimation, setResetAnimation] = useState(false);
+  const [currentCarIndex, setCurrentCarIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  // Car models array - limited to the two specified models
+  const carModels = [
+    { image: '/neta-car.png', name: 'NETA V-II' },
+    { image: '/neta-x.png', name: 'NETA X' },
+  ];
 
-  // Function to reset and restart animations
+  // Function to reset and restart animations with car transition
   const startAnimationSequence = () => {
     // First set reset mode to true (all elements fade out)
     setResetAnimation(true);
+    setIsTransitioning(true);
     
     // After elements fade out, reset states and start sequence
     setTimeout(() => {
@@ -30,6 +39,9 @@ function HomePage() {
       setCloudsFadeIn(false);
       setResetAnimation(false);
       
+      // Set next car as part of the reset
+      setCurrentCarIndex((prevIndex) => (prevIndex + 1) % carModels.length);
+      
       // Slight delay before starting next animation sequence
       setTimeout(() => {
         // Start sequence with delays
@@ -37,7 +49,10 @@ function HomePage() {
         setTimeout(() => setLogoFadeIn(true), 100);   // Logo next
         setTimeout(() => setTextFadeIn(true), 800);
         setTimeout(() => setButtonFadeIn(true), 1500);
-        setTimeout(() => setCarFadeIn(true), 2200);
+        setTimeout(() => {
+          setCarFadeIn(true);
+          setIsTransitioning(false);
+        }, 2200);
       }, 100);
     }, 800); // Allow 800ms for fade out
   };
@@ -50,14 +65,16 @@ function HomePage() {
     setTimeout(() => setButtonFadeIn(true), 1500);
     setTimeout(() => setCarFadeIn(true), 2200);
     
-    // Set up interval to restart animations every 20 seconds
+    // Set up interval to switch cars and refresh animations every 10 seconds
     const intervalId = setInterval(() => {
-      startAnimationSequence();
-    }, 20000);
+      if (!isTransitioning) {
+        startAnimationSequence();
+      }
+    }, 10000); // 10 seconds per car
     
     // Clean up interval on component unmount
     return () => clearInterval(intervalId);
-  }, []);
+  }, [isTransitioning]);
 
   const handleCalculatorClick = () => {
     navigate('/calculator');
@@ -128,7 +145,7 @@ function HomePage() {
       {/* Logo Section - responsive padding and sizing */}
       <Box
         sx={{
-          pt: isMobile ? (isLandscape ? 2 : 6) : isTablet ? 8 : 15,
+          pt: isMobile ? (isLandscape ? 2 : 6) : isTablet ? 8 : 25,
           pb: isMobile ? 1 : 2,
           display: 'flex',
           justifyContent: 'center',
@@ -335,8 +352,7 @@ function HomePage() {
             flexDirection: 'column',
             alignItems: 'center',
             opacity: resetAnimation ? 0 : (carFadeIn ? 1 : 0),
-            transform: carFadeIn ? 'translateY(0)' : 'translateY(30px)',
-            transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
+            transition: 'opacity 0.8s ease-out',
             zIndex: 2,
           }}
         >
@@ -345,44 +361,80 @@ function HomePage() {
             src="/charging-station.png"
             alt="Charging Station"
             style={{
-              height: isMobile ? (isLandscape ? '200px' : '250px') : isTablet ? '350px' : '550px',
+              height: isMobile ? (isLandscape ? '200px' : '250px') : isTablet ? '350px' : '450px',
               position: 'absolute',
               left: isMobile ? '5%' : '10%',
               bottom: isMobile ? (isLandscape ? '20%' : '30%') : isTablet ? '40%' : '55%',
               transition: 'transform 0.8s ease-out',
               transform: resetAnimation ? 'translateY(20px)' : 'translateY(0)',
               display: isMobile && isLandscape ? 'none' : 'block', // Only hide in mobile landscape
+              zIndex: 5,
             }}
           />
 
-          <img
-            src="/neta-car.png"
-            alt="NETA V-II Electric Car"
-            style={{
-              width: '100%',
-              maxWidth: isMobile ? (isLandscape ? '400px' : '600px') : isTablet ? '800px' : '1000px',
-              marginBottom: isMobile ? '10px' : '20px',
-              zIndex: '10',
-              transition: 'transform 0.8s ease-out',
-              transform: resetAnimation ? 'translateX(-30px)' : 'translateX(0)',
-              animation: 'float 5s ease-in-out infinite',
-            }}
-          />
-
-          <Typography
-            variant="h6"
-            component="p"
+          {/* Current Car Model */}
+          <Box
             sx={{
-              fontWeight: 400,
-              color: '#333',
-              mb: isMobile ? 2 : 6,
-              fontSize: isMobile ? '1rem' : '1.5rem',
-              textAlign: 'center',
-              display: isMobile && isLandscape ? 'none' : 'block', // Hide in mobile landscape
+              width: '80%',
+              maxWidth: isMobile ? (isLandscape ? '400px' : '600px') : isTablet ? '800px' : '900px',
+              marginBottom: isMobile ? '10px' : '20px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              transition: 'opacity 0.8s ease-out',
             }}
           >
-            NETA V-II, Your True Value City EV
-          </Typography>
+            <img
+              src={carModels[currentCarIndex].image}
+              alt={`NETA ${carModels[currentCarIndex].name} Electric Car`}
+              style={{
+                width: '100%',
+                zIndex: '10',
+                transition: 'transform 0.8s ease-out',
+                transform: resetAnimation ? 'translateX(-30px)' : 'translateX(0)',
+                animation: 'float 5s ease-in-out infinite',
+              }}
+            />
+            <Typography
+              variant="h6"
+              component="p"
+              sx={{
+                fontWeight: 400,
+                color: '#333',
+                mt: 2,
+                mb: isMobile ? 2 : 6,
+                fontSize: isMobile ? '1rem' : '1.5rem',
+                textAlign: 'center',
+                display: isMobile && isLandscape ? 'none' : 'block', // Hide in mobile landscape
+              }}
+            >
+              {carModels[currentCarIndex].name}, Your True Value City EV
+            </Typography>
+          </Box>
+
+          {/* Car selection indicators */}
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              gap: 1,
+              mb: 2,
+              display: isMobile && isLandscape ? 'none' : 'flex', // Hide in mobile landscape
+            }}
+          >
+            {carModels.map((_, index) => (
+              <Box 
+                key={index}
+                sx={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  backgroundColor: index === currentCarIndex ? '#ff6600' : '#ccc',
+                  transition: 'background-color 0.3s ease-out',
+                }}
+              />
+            ))}
+          </Box>
         </Box>
       </Box>
 

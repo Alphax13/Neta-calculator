@@ -7,8 +7,28 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 function ChargingCalculator() {
   const carModels = [
-    { model: 'neta-v2', name: 'Neta V II', image: '/neta-car.png', fuelEfficiency: 18.36, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 34.28 },
-    { model: 'neta-x', name: 'Neta X', image: '/neta-x.png', fuelEfficiency: 14.88, electricEfficiency: 18.5, costPerKWh: 4.2, fuelCostPerL: 34.28 }
+    { 
+      model: 'neta-v2', 
+      name: 'Neta V II', 
+      image: '/neta-car.png', 
+      fuelEfficiencyMin: 11, 
+      fuelEfficiencyMax: 20, 
+      electricEfficiencyMin: 11, 
+      electricEfficiencyMax: 19, 
+      costPerKWh: 2.9709, 
+      fuelCostPerL: 34.28 
+    },
+    { 
+      model: 'neta-x', 
+      name: 'Neta X', 
+      image: '/neta-x.png', 
+      fuelEfficiencyMin: 11, 
+      fuelEfficiencyMax: 20, 
+      electricEfficiencyMin: 11, 
+      electricEfficiencyMax: 19, 
+      costPerKWh: 2.9709, 
+      fuelCostPerL: 34.28 
+    }
   ];
 
   // ตรวจสอบขนาดหน้าจอสำหรับการแสดงผลแบบ Responsive
@@ -19,8 +39,10 @@ function ChargingCalculator() {
   const [carModelIndex, setCarModelIndex] = useState(0);
   const [kilometers, setKilometers] = useState('');
   const [expanded, setExpanded] = useState(false);
-  const [chargingCost, setChargingCost] = useState({ min: 0, max: 0 });
-  const [gasCost, setGasCost] = useState({ min: 0, max: 0 });
+  const [chargingCostMin, setChargingCostMin] = useState(0);
+  const [chargingCostMax, setChargingCostMax] = useState(0);
+  const [gasCostMin, setGasCostMin] = useState(0);
+  const [gasCostMax, setGasCostMax] = useState(0);
   const [isCalculated, setIsCalculated] = useState(false);
   const [slideDirection, setSlideDirection] = useState(0); // -1 เลื่อนไปซ้าย, 1 เลื่อนไปขวา, 0 ค่าตั้งต้น
 
@@ -77,45 +99,51 @@ function ChargingCalculator() {
   };
 
   // ฟังก์ชันคำนวณค่าน้ำมัน
-  const calculateFuel = (distance, efficiency, costPerL) => {
-    const fuelConsumed = distance / efficiency;
-    return fuelConsumed * costPerL;
+  const calculateFuel = (distance, efficiencyMin, efficiencyMax, costPerL) => {
+    const fuelConsumedMin = distance / efficiencyMax; // ใช้ค่า max efficiency เพื่อหาค่าน้ำมันต่ำสุด
+    const fuelConsumedMax = distance / efficiencyMin; // ใช้ค่า min efficiency เพื่อหาค่าน้ำมันสูงสุด
+    
+    return {
+      min: fuelConsumedMin * costPerL,
+      max: fuelConsumedMax * costPerL
+    };
   };
 
   // ฟังก์ชันคำนวณค่าไฟฟ้าชาร์จ
-  const calculateElectricCost = (distance, efficiency, costPerKWh) => {
-    const unitsConsumed = (distance / 100) * efficiency;
-    return unitsConsumed * costPerKWh;
-  };
-
-  // ปัดค่าให้อยู่ในช่วงที่ใกล้เคียงตามช่วงที่กำหนด
-  const roundToRange = (value, range) => {
-    return `${Math.floor(value / range) * range}-${Math.ceil(value / range) * range}`;
-  };
-
-  // ถ้าค่าน้อยกว่า 100 แสดงค่าจริง ถ้ามากกว่าหรือเท่ากับ 100 ให้แสดงเป็นช่วง
-  const formatCostDisplay = (value, range) => {
-    if (value < 100) {
-      const rounded = value.toFixed(2);
-      return { min: rounded, max: rounded };
-    } else {
-      const [min, max] = roundToRange(value, range).split('-');
-      return { min, max };
-    }
+  const calculateElectricCost = (distance, efficiencyMin, efficiencyMax, costPerKWh) => {
+    const unitsConsumedMin = (distance / 100) * efficiencyMin; // ใช้ค่า min efficiency เพื่อหาค่าไฟต่ำสุด
+    const unitsConsumedMax = (distance / 100) * efficiencyMax; // ใช้ค่า max efficiency เพื่อหาค่าไฟสูงสุด
+    
+    return {
+      min: unitsConsumedMin * costPerKWh,
+      max: unitsConsumedMax * costPerKWh
+    };
   };
 
   const handleCalculate = () => {
     const km = parseFloat(kilometers);
     if (!isNaN(km) && km > 0) {
       // คำนวณค่าน้ำมัน
-      const fuelCost = calculateFuel(km, currentCarModel.fuelEfficiency, currentCarModel.fuelCostPerL);
-
+      const fuelCost = calculateFuel(
+        km, 
+        currentCarModel.fuelEfficiencyMin, 
+        currentCarModel.fuelEfficiencyMax, 
+        currentCarModel.fuelCostPerL
+      );
+      
       // คำนวณค่าไฟฟ้าสำหรับชาร์จ
-      const electricCost = calculateElectricCost(km, currentCarModel.electricEfficiency, currentCarModel.costPerKWh);
-
-      // ใช้ formatCostDisplay เพื่อแสดงค่าจริงหากน้อยกว่า 100 บาท
-      setChargingCost(formatCostDisplay(electricCost, 100));
-      setGasCost(formatCostDisplay(fuelCost, 100));
+      const electricCost = calculateElectricCost(
+        km, 
+        currentCarModel.electricEfficiencyMin, 
+        currentCarModel.electricEfficiencyMax, 
+        currentCarModel.costPerKWh
+      );
+      
+      // เก็บค่าที่คำนวณได้โดยตรง แทนการปัดเศษ
+      setChargingCostMin(electricCost.min.toFixed(2));
+      setChargingCostMax(electricCost.max.toFixed(2));
+      setGasCostMin(fuelCost.min.toFixed(2));
+      setGasCostMax(fuelCost.max.toFixed(2));
 
       setExpanded(true);
       setIsCalculated(true);
@@ -236,8 +264,8 @@ function ChargingCalculator() {
           sx={{ 
             display: 'flex', 
             alignItems: 'center', 
-            mb: isMobile ? 1 : 2, 
-            pt: isMobile ? 3 : isTablet ? 10 : 15,
+            mb: isMobile ? 1 : 1, 
+            pt: isMobile ? 3 : isTablet ? 10 : 10,
             cursor: 'pointer',
           }}
           onClick={() => window.open('https://www.neta.co.th/th', '_blank')}
@@ -246,7 +274,7 @@ function ChargingCalculator() {
             src="/neta-logo.png" 
             alt="NETA" 
             style={{ 
-              height: isMobile ? '40px' : '100px',
+              height: isMobile ? '40px' : '80px',
               maxWidth: '100%'
             }} 
           />
@@ -298,7 +326,7 @@ function ChargingCalculator() {
                   เลือกรุ่น
                 </Typography>
 
-                <FormControl fullWidth sx={{ mb: isMobile ? 3 : 4 }}>
+                <FormControl fullWidth sx={{ mb: isMobile ? 3 : 2 }}>
                   <Select
                     value={currentCarModel.model}
                     onChange={handleCarModelChange}
@@ -311,7 +339,7 @@ function ChargingCalculator() {
                     )}
                     sx={{
                       borderRadius: 1,
-                      height: isMobile ? '40px' : '100px',
+                      height: isMobile ? '40px' : '80px',
                       '& .MuiOutlinedInput-notchedOutline': {
                         borderColor: '#ddd',
                       },
@@ -359,7 +387,7 @@ function ChargingCalculator() {
                   sx={{
                     mb: isMobile ? 3 : 4,
                     '& .MuiOutlinedInput-root': {
-                      height: isMobile ? '40px' : '100px',
+                      height: isMobile ? '40px' : '80px',
                       borderRadius: 1,
                       fontSize: isMobile ? '1rem' : isTablet ? '2rem' : '2.5rem',
                       '& fieldset': {
@@ -426,7 +454,7 @@ function ChargingCalculator() {
             <Box 
               sx={{ 
                 width: '100%', 
-                height: isMobile ? '30px' : '100px',
+                height: isMobile ? '30px' : '80px',
                 borderRadius: 1,
                 border: '1px solid #ddd',
                 display: 'flex',
@@ -458,7 +486,7 @@ function ChargingCalculator() {
             <Box 
               sx={{ 
                 width: '90%', 
-                height: isMobile ? '30px' : '100px',
+                height: isMobile ? '30px' : '80px',
                 borderRadius: 1,
                 border: '1px solid #ddd',
                 display: 'flex',
@@ -487,7 +515,7 @@ function ChargingCalculator() {
               </Typography>
               <Typography 
                 sx={{ 
-                  fontSize: isMobile ? '1rem' : '3rem', 
+                  fontSize: isMobile ? '1rem' : '2rem', 
                   fontWeight: 600, 
                   color: '#4caf50',
                   ml: 'auto',
@@ -496,9 +524,7 @@ function ChargingCalculator() {
                   textAlign: 'right',
                 }}
               >
-                {chargingCost.min === chargingCost.max
-                  ? `${chargingCost.min}`
-                  : `${chargingCost.min}-${chargingCost.max}`}
+                {chargingCostMin} - {chargingCostMax}
               </Typography>
               <Typography sx={{ 
                 fontSize: isMobile ? '0.8rem' : '2rem', 
@@ -512,7 +538,7 @@ function ChargingCalculator() {
             <Box 
               sx={{ 
                 width: '90%', 
-                height: isMobile ? '30px' : '100px',
+                height: isMobile ? '30px' : '80px',
                 borderRadius: 1,
                 border: '1px solid #ddd',
                 display: 'flex',
@@ -542,7 +568,7 @@ function ChargingCalculator() {
               </Typography>
               <Typography 
                 sx={{ 
-                  fontSize: isMobile ? '1rem' : '3rem',  
+                  fontSize: isMobile ? '1rem' : '2rem',  
                   fontWeight: 600, 
                   color: '#f44336',
                   ml: 'auto',
@@ -551,9 +577,7 @@ function ChargingCalculator() {
                   textAlign: 'right',
                 }}
               >
-                {gasCost.min === gasCost.max
-                  ? `${gasCost.min}`
-                  : `${gasCost.min}-${gasCost.max}`}
+                {gasCostMin} - {gasCostMax}
               </Typography>
               <Typography sx={{ 
                 fontSize: isMobile ? '0.8rem' : '2rem', 
@@ -579,7 +603,7 @@ function ChargingCalculator() {
             <Box 
               sx={{ 
                 width: '100%', 
-                height: isMobile ? '30px' : '100px',
+                height: isMobile ? '30px' : '80px',
                 borderRadius: 1,
                 border: '1px solid #ddd',
                 display: 'flex',
@@ -589,7 +613,7 @@ function ChargingCalculator() {
               }}
             >
               <Typography sx={{ 
-                fontSize: isMobile ? '1.2rem' : '3rem',
+                fontSize: isMobile ? '1.2rem' : '2.5rem',
                 padding: '0 8px',
               }}>
                 {kilometers} กิโลเมตร
@@ -600,7 +624,7 @@ function ChargingCalculator() {
             <Box sx={{ 
               display: 'flex', 
               justifyContent: 'center', 
-              mt: 2,
+              mt: 0,
               width: '100%'
             }}>
               <Button
@@ -642,7 +666,7 @@ function ChargingCalculator() {
               }}>
                 <Typography 
                   sx={{ 
-                    fontSize: isMobile ? '0.4rem' : '1.5rem', 
+                    fontSize: isMobile ? '0.4rem' : '1rem', 
                     fontWeight: 400, 
                     textAlign: 'center', 
                     lineHeight: 1.5, 
@@ -650,7 +674,7 @@ function ChargingCalculator() {
                     mb: 2,
                   }}
                 >
-                  คำนวณจากอัตราสิ้นเปลืองยานยนต์ไฟฟ้า 12kwh/100km ถึง 19kwh/100km ทั้งนี้ อัตราสิ้นเปลืองอาจแตกต่างกันไปขึ้นอยู่กับปัจจัยต่างๆ เช่น อุณหภูมิแวดล้อม สภาพแวดล้อม สไตล์การขับขี่ จำนวนผู้โดยสารในรถ เป็นต้น
+                  คำนวณจากอัตราสิ้นเปลืองยานยนต์ไฟฟ้า 11kwh/100km ถึง 19kwh/100km ทั้งนี้ อัตราสิ้นเปลืองอาจแตกต่างกันไปขึ้นอยู่กับปัจจัยต่างๆ เช่น อุณหภูมิแวดล้อม สภาพแวดล้อม สไตล์การขับขี่ จำนวนผู้โดยสารในรถ เป็นต้น
                 </Typography>
               </Box>
           </Box>
@@ -693,7 +717,7 @@ function ChargingCalculator() {
               sx={{
                 color: '#333',
                 fontWeight: 500,
-                fontSize: isMobile ? '1rem' : isTablet ? '1rem' : '1.5rem',
+                fontSize: isMobile ? '1rem' : '3rem',
                 textAlign: 'center',
                 mb: isMobile ? 1 : 2,
               }}
@@ -792,7 +816,7 @@ function ChargingCalculator() {
             <Typography
               variant="body2"
               sx={{
-                mt: isMobile ? 1 : 2,
+                mt: isMobile ? 0 : 0,
                 color: '#333',
                 fontWeight: 500,
                 fontSize: isMobile ? '0.8rem' : isTablet ? '1rem' : '1rem',
