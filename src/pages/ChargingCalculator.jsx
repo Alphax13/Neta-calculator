@@ -222,8 +222,8 @@ function ChargingCalculator() {
           maxWidth: '1920px',
           mx: 'auto',
           width: '100%',
-          px: isMobile ? 0 : 4,
-          py: isMobile ? 2 : 0,
+          px: isMobile ? 0 : 0,
+          py: isMobile ? 0 : 0,
           overflowY: isLandscape && isMobile ? 'auto' : 'inherit',
         }}
       >
