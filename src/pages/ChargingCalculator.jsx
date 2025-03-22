@@ -697,8 +697,8 @@ function ChargingCalculator() {
                   style={{
                     width: '100%',
                     maxWidth: isLandscape && isMobile ? '60%' : '800px',
-                    maxHeight: isLandscape && isMobile ? '30vh' : 'auto',
-                    marginBottom: isMobile ? '10px' : '20px',
+                    maxHeight: isLandscape && isMobile ? '10vh' : 'auto',
+                    marginBottom: isMobile ? 0 : '20px',
                     objectFit: 'contain'
                   }}
                 />
