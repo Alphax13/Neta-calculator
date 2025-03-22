@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, TextField, Button, Select, MenuItem, FormControl, Paper, IconButton } from '@mui/material';
+import { Box, Typography, TextField, Button, Select, MenuItem, FormControl, Paper, IconButton, useMediaQuery } from '@mui/material';
 import { ArrowBack, ArrowForward, KeyboardBackspace } from '@mui/icons-material';
 import EvStationIcon from '@mui/icons-material/EvStation';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
@@ -11,6 +11,11 @@ function ChargingCalculator() {
     { model: 'neta-x', name: 'Neta X 480', image: '/neta-x.png', fuelEfficiency: 19.5, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 34.28 }
   ];
 
+  // Responsive breakpoints
+  const isMobile = useMediaQuery('(max-width:600px)');
+  const isTablet = useMediaQuery('(max-width:960px)');
+  const isLandscape = useMediaQuery('(orientation: landscape)');
+  
   const [carModelIndex, setCarModelIndex] = useState(0);
   const [kilometers, setKilometers] = useState('');
   const [expanded, setExpanded] = useState(false);
@@ -175,13 +180,15 @@ function ChargingCalculator() {
   return (
     <Box
       sx={{
-        height: '100vh',
+        minHeight: '100vh',
+        height: isLandscape && isMobile ? 'auto' : '100vh',
         backgroundImage: `url('/cal.png')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        backgroundAttachment: isLandscape && isMobile ? 'scroll' : 'fixed',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden',
+        overflow: isLandscape && isMobile ? 'auto' : 'hidden',
         position: 'relative',
       }}
     >
@@ -190,18 +197,20 @@ function ChargingCalculator() {
         onClick={handleBackClick}
         sx={{
           position: 'absolute',
-          top: 20,
-          left: 20,
+          top: isMobile ? 10 : 20,
+          left: isMobile ? 10 : 20,
           backgroundColor: 'rgba(255, 255, 255, 0.8)',
           boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
           '&:hover': {
             backgroundColor: 'rgba(255, 255, 255, 1)',
           },
           zIndex: 10,
+          width: isMobile ? 40 : 48,
+          height: isMobile ? 40 : 48,
         }}
         aria-label="back to homepage"
       >
-        <KeyboardBackspace sx={{ fontSize: '2rem', color: '#003f88' }} />
+        <KeyboardBackspace sx={{ fontSize: isMobile ? '1.5rem' : '2rem', color: '#003f88' }} />
       </IconButton>
 
       <Box
@@ -213,6 +222,9 @@ function ChargingCalculator() {
           maxWidth: '1920px',
           mx: 'auto',
           width: '100%',
+          px: isMobile ? 0 : 4,
+          py: isMobile ? 2 : 0,
+          overflowY: isLandscape && isMobile ? 'auto' : 'inherit',
         }}
       >
         {/* Clickable Logo */}
@@ -220,13 +232,20 @@ function ChargingCalculator() {
           sx={{ 
             display: 'flex', 
             alignItems: 'center', 
-            mb: 2, 
-            pt: 15,
+            mb: isMobile ? 1 : 2, 
+            pt: isMobile ? 3 : isTablet ? 10 : 15,
             cursor: 'pointer',
           }}
           onClick={() => window.open('https://www.neta.co.th/th', '_blank')}
         >
-          <img src="/neta-logo.png" alt="NETA" style={{ height: '100px' }} />
+          <img 
+            src="/neta-logo.png" 
+            alt="NETA" 
+            style={{ 
+              height: isMobile ? '40px' : '100px',
+              maxWidth: '100%'
+            }} 
+          />
         </Box>
 
         <Typography
@@ -235,9 +254,9 @@ function ChargingCalculator() {
           sx={{
             fontWeight: 400,
             color: '#000',
-            mb: 4,
+            mb: isMobile ? 2 : 4,
             textAlign: 'center',
-            fontSize: '3rem',
+            fontSize: isMobile ? '1rem' : isTablet ? '2.5rem' : '3rem',
           }}
         >
           ขับเท่านี้ ค่าชาร์จไฟเท่าไหน?
@@ -246,16 +265,16 @@ function ChargingCalculator() {
         <Paper
           elevation={3}
           sx={{
-            width: '100%',
+            width: '80%',
             maxWidth: '800px',
             borderRadius: 4,
             overflow: 'hidden',
-            mb: 4,
+            mb: isMobile ? 2 : 4,
           }}
         >
           <Box
             sx={{
-              p: 4,
+              p: isMobile ? 2 : 4,
               backgroundColor: 'white',
             }}
           >
@@ -269,38 +288,38 @@ function ChargingCalculator() {
                     mb: 1,
                     fontWeight: 500,
                     color: '#555',
-                    fontSize: '2rem',
+                    fontSize: isMobile ? '1rem' : isTablet ? '1.8rem' : '2rem',
                   }}
                 >
                   เลือกรุ่น
                 </Typography>
 
-                <FormControl fullWidth sx={{ mb: 4 }}>
+                <FormControl fullWidth sx={{ mb: isMobile ? 3 : 4 }}>
                   <Select
                     value={currentCarModel.model}
                     onChange={handleCarModelChange}
                     displayEmpty
                     renderValue={currentCarModel.model !== '' ? undefined : () => (
-                      <Box sx={{ display: 'flex', alignItems: 'center', color: '#aaa', fontSize: '2rem' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', color: '#aaa', fontSize: isMobile ? '1rem' : '2rem' }}>
                         <span style={{ color: '#EAB142', marginRight: '5px' }}>▼</span>
                         <span>กรุณาเลือกรุ่น</span>
                       </Box>
                     )}
                     sx={{
                       borderRadius: 1,
-                      height: '100px',
+                      height: isMobile ? '40px' : '100px',
                       '& .MuiOutlinedInput-notchedOutline': {
                         borderColor: '#ddd',
                       },
                       '& .MuiSelect-select': {
-                        padding: '15px',
+                        padding: isMobile ? '4px' : '15px',
                       },
                     }}
                     disabled={isCalculated}
                   >
                     {carModels.map((car, index) => (
                       <MenuItem key={car.model} value={car.model}>
-                        <Typography sx={{ fontWeight: 500, color: '#333', fontSize: '2.5rem' }}>
+                        <Typography sx={{ fontWeight: 400, color: '#333', fontSize: isMobile ? '1rem' : isTablet ? '2rem' : '2.5rem' }}>
                           {car.name}
                         </Typography>
                       </MenuItem>
@@ -315,7 +334,7 @@ function ChargingCalculator() {
                     mb: 1,
                     fontWeight: 500,
                     color: '#555',
-                    fontSize: { xs: '1.5rem', md: '1.8rem', lg: '2rem' },
+                    fontSize: isMobile ? '1rem' : isTablet ? '1rem' : '2rem',
                   }}
                 >
                   กิโลเมตรต่อวัน
@@ -333,16 +352,16 @@ function ChargingCalculator() {
                     pattern: '[0-9]*'
                   }}
                   sx={{
-                    mb: 4,
+                    mb: isMobile ? 3 : 4,
                     '& .MuiOutlinedInput-root': {
-                      height: '100px',
+                      height: isMobile ? '40px' : '100px',
                       borderRadius: 1,
-                      fontSize: '2.5rem',
+                      fontSize: isMobile ? '1rem' : isTablet ? '2rem' : '2.5rem',
                       '& fieldset': {
                         borderColor: '#ddd',
                       },
                       '& input': {
-                        padding: '15px',
+                        padding: isMobile ? '10px' : '15px',
                       },
                     },
                   }}
@@ -352,7 +371,7 @@ function ChargingCalculator() {
                         variant="body2" 
                         color="textSecondary"
                         sx={{ 
-                          fontSize: '2rem',
+                          fontSize: isMobile ? '1rem' : '2rem',
                         }}
                       >
                         กิโลเมตร
@@ -362,212 +381,259 @@ function ChargingCalculator() {
                 />
 
                 {/* Calculate Button */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: isMobile ? 0 : 3 }}>
                   <Button
                     variant="contained"
                     onClick={handleCalculate}
                     sx={{
                       borderRadius: 25,
-                      px: 6,
-                      py: 1.5,
+                      px: 4,
+                      py: isMobile ? 1 : 1.5,
                       backgroundColor: '#003f88',
                       '&:hover': {
                         backgroundColor: '#002d63',
                       },
-                      width: '80%',
-                      fontSize: '2rem',
+                      width: '70%',
+                      fontSize: isMobile ? '1rem' : isTablet ? '1rem' : '2rem',
                       fontWeight: 500,
                       textTransform: 'none',
                     }}
                   >
-                    คำนวณ <img src="/neta-arrow.svg" alt="NETA" style={{ height: '50px', marginLeft: '8px' }} />
+                    คำนวณ <img src="/neta-arrow.svg" alt="NETA" style={{ height: isMobile ? '30px' : '40px', marginLeft: '8px' }} />
                   </Button>
                 </Box>
               </>
             ) : (
               // Results display section
-              <Box sx={{ textAlign: 'center', py: 2 }}>
-                <Typography 
-                  sx={{ 
-                    fontSize: '2rem', 
-                    fontWeight: 500, 
-                    mb: 2,
-                    textAlign: 'left',
-                    px: 2
-                  }}
-                >
-                  เลือกรุ่น
-                </Typography>
+          <Box sx={{ textAlign: 'center', py: isMobile ? 0 : 2, }}>
+            <Typography 
+              sx={{ 
+                fontSize: isMobile ? '1rem' : '2rem', 
+                fontWeight: 500, 
+                mb: 1,
+                textAlign: 'left',
+                px: 2,
+              }}
+            >
+              เลือกรุ่น
+            </Typography>
 
-                <Box 
-                  sx={{ 
-                    width: '100%', 
-                    height: '100px',
-                    borderRadius: 1,
-                    border: '1px solid #ddd',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mb: 3
-                  }}
-                >
-                  <Typography sx={{ fontSize: '2.5rem' }}>
-                    {currentCarModel.name}
-                  </Typography>
+            <Box 
+              sx={{ 
+                width: '100%', 
+                height: isMobile ? '30px' : '100px',
+                borderRadius: 1,
+                border: '1px solid #ddd',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mb: isMobile ? 1 : 3,
+                overflowX: 'auto',  // เพิ่มการเลื่อนแนวนอน
+              }}
+            >
+              <Typography sx={{ 
+                fontSize: isMobile ? '1rem' : '2.5rem',
+                padding: '0 8px',
+              }}>
+                {currentCarModel.name}
+              </Typography>
+            </Box>
+
+            <Typography 
+              sx={{ 
+                fontSize: isMobile ? '1rem' : '2rem', 
+                fontWeight: 500,
+                mb: 1,
+                textAlign: 'left',
+                px: 2,
+              }}
+            >
+              ค่าชาร์จไฟ
+            </Typography>
+
+            <Box 
+              sx={{ 
+                width: '90%', 
+                height: isMobile ? '30px' : '100px',
+                borderRadius: 1,
+                border: '1px solid #ddd',
+                display: 'flex',
+                alignItems: 'center',
+                px: isMobile ? 2 : 4,
+                mb: isMobile ? 1 : 3,
+                backgroundColor: '#f8f8f8',
+                mx: 'auto',
+                overflowX: 'auto',  // เพิ่มการเลื่อนแนวนอน
+              }}
+            >
+              <EvStationIcon 
+                sx={{ 
+                  color: '#7ab8db', 
+                  fontSize: isMobile ? '1.5rem' : '3rem',
+                  mr: 1,
+                  flexShrink: 0
+                }} 
+              />
+              <Typography sx={{ 
+                fontSize: isMobile ? '1rem' : '2rem', 
+                mr: 1, 
+                whiteSpace: 'nowrap',
+                flexShrink: 0
+              }}>
+                ค่าชาร์จไฟ
+              </Typography>
+              <Typography 
+                sx={{ 
+                  fontSize: isMobile ? '1rem' : '3rem', 
+                  fontWeight: 600, 
+                  color: '#4caf50',
+                  ml: 'auto',
+                  mr: 1,
+                  flex: 1,
+                  textAlign: 'right',
+                }}
+              >
+                {chargingCost.min}-{chargingCost.max}
+              </Typography>
+              <Typography sx={{ 
+                fontSize: isMobile ? '0.8rem' : '2rem', 
+                whiteSpace: 'nowrap',
+                flexShrink: 0
+              }}>
+                /บาท
+              </Typography>
+            </Box>
+
+            <Box 
+              sx={{ 
+                width: '90%', 
+                height: isMobile ? '30px' : '100px',
+                borderRadius: 1,
+                border: '1px solid #ddd',
+                display: 'flex',
+                alignItems: 'center',
+                px: isMobile ? 2 : 4,
+                mb: isMobile ? 1 : 3,
+                backgroundColor: '#f8f8f8',
+                mx: 'auto',
+                overflowX: 'auto',  // เพิ่มการเลื่อนแนวนอน
+              }}
+            >
+              <LocalGasStationIcon 
+                sx={{ 
+                  color: '#7ab8db', 
+                  fontSize: isMobile ? '1.5rem' : '3rem',
+                  mr: 1,
+                  flexShrink: 0
+                }} 
+              />
+              <Typography sx={{ 
+                fontSize: isMobile ? '1rem' : '2rem', 
+                mr: 1, 
+                whiteSpace: 'nowrap',
+                flexShrink: 0
+              }}>
+                ค่าน้ำมัน
+              </Typography>
+              <Typography 
+                sx={{ 
+                  fontSize: isMobile ? '1rem' : '3rem',  
+                  fontWeight: 600, 
+                  color: '#f44336',
+                  ml: 'auto',
+                  mr: 1,
+                  flex: 1,
+                  textAlign: 'right',
+                }}
+              >
+                {gasCost.min}-{gasCost.max}
+              </Typography>
+              <Typography sx={{ 
+                fontSize: isMobile ? '0.8rem' : '2rem', 
+                whiteSpace: 'nowrap',
+                flexShrink: 0
+              }}>
+                /บาท
+              </Typography>
+            </Box>
+
+            <Typography 
+              sx={{ 
+                fontSize: isMobile ? '1rem' : '2rem', 
+                fontWeight: 500,
+                mb: 1,
+                textAlign: 'left',
+                px: 2,
+              }}
+            >
+              ระยะทาง
+            </Typography>
+
+            <Box 
+              sx={{ 
+                width: '100%', 
+                height: isMobile ? '30px' : '100px',
+                borderRadius: 1,
+                border: '1px solid #ddd',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mb: isMobile ? 1 : 4,
+                overflowX: 'auto',  // เพิ่มการเลื่อนแนวนอน
+              }}
+            >
+              <Typography sx={{ 
+                fontSize: isMobile ? '1.2rem' : '3rem',
+                padding: '0 8px',
+              }}>
+                {kilometers} กิโลเมตร
+              </Typography>
+            </Box>
+
+            {/* Reset Button */}
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              mt: 2,
+              overflowX: 'auto',  // เพิ่มการเลื่อนสำหรับส่วนของปุ่ม
+              width: '100%'
+            }}>
+              <Button
+                variant="contained"
+                onClick={handleReset}
+                sx={{
+                  borderRadius: 25,
+                  px: 4,
+                  py: isMobile ? 0.5 : 1.5,
+                  backgroundColor: '#003f88',
+                  '&:hover': {
+                    backgroundColor: '#002d63',
+                  },
+                  width: '80%',
+                  fontSize: isMobile ? '1rem' : isTablet ? '1rem' : '2rem',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  whiteSpace: 'nowrap',
+                }}>
+                  รีเซ็ต <img src="/neta-arrow.svg" alt="NETA" style={{ height: isMobile ? '30px' : '40px', marginLeft: '8px' }} />
                 </Box>
-
-                <Typography 
-                  sx={{ 
-                    fontSize: '2rem', 
-                    fontWeight: 500,
-                    mb: 2,
-                    textAlign: 'left',
-                    px: 2
-                  }}
-                >
-                  ค่าชาร์จไฟ
-                </Typography>
-
-                <Box 
-                  sx={{ 
-                    width: '90%', 
-                    height: '100px',
-                    borderRadius: 1,
-                    border: '1px solid #ddd',
-                    display: 'flex',
-                    alignItems: 'center',
-                    px: 4,
-                    mb: 3,
-                    backgroundColor: '#f8f8f8'
-                  }}
-                >
-                  <EvStationIcon 
-                    sx={{ 
-                      color: '#7ab8db', 
-                      fontSize: '3rem',
-                      mr: 2
-                    }} 
-                  />
-                  <Typography sx={{ fontSize: '2rem', mr: 2 }}>
-                    ค่าชาร์จไฟ
-                  </Typography>
-                  <Typography 
-                    sx={{ 
-                      fontSize: '3rem', 
-                      fontWeight: 600, 
-                      color: '#4caf50',
-                      ml: 'auto',
-                      mr: 1,
-                      flex: 1,
-                      textAlign: 'right'
-                    }}
-                  >
-                    {chargingCost.min}-{chargingCost.max}
-                  </Typography>
-                  <Typography sx={{ fontSize: '2rem', whiteSpace: 'nowrap' }}>
-                    /บาท
-                  </Typography>
-                </Box>
-
-                <Box 
-                  sx={{ 
-                    width: '90%', 
-                    height: '100px',
-                    borderRadius: 1,
-                    border: '1px solid #ddd',
-                    display: 'flex',
-                    alignItems: 'center',
-                    px: 4,
-                    mb: 3,
-                    backgroundColor: '#f8f8f8'
-                  }}
-                >
-                  <LocalGasStationIcon 
-                    sx={{ 
-                      color: '#7ab8db', 
-                      fontSize: '3rem',
-                      mr: 2
-                    }} 
-                  />
-                  <Typography sx={{ fontSize: '2rem', mr: 2 }}>
-                    ค่าน้ำมัน
-                  </Typography>
-                  <Typography 
-                    sx={{ 
-                      fontSize: '3rem',  
-                      fontWeight: 600, 
-                      color: '#f44336',
-                      ml: 'auto',
-                      mr: 1,
-                      flex: 1,
-                      textAlign: 'right'
-                    }}
-                  >
-                    {gasCost.min}-{gasCost.max}
-                  </Typography>
-                  <Typography sx={{ fontSize: '2rem', whiteSpace: 'nowrap' }}>
-                    /บาท
-                  </Typography>
-                </Box>
-
-                <Typography 
-                  sx={{ 
-                    fontSize: '2rem', 
-                    fontWeight: 500,
-                    mb: 2,
-                    textAlign: 'left',
-                    px: 2
-                  }}
-                >
-                  ระยะทาง
-                </Typography>
-
-                <Box 
-                  sx={{ 
-                    width: '100%', 
-                    height: '100px',
-                    borderRadius: 1,
-                    border: '1px solid #ddd',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mb: 4
-                  }}
-                >
-                  <Typography sx={{ fontSize: '3rem' }}>
-                    {kilometers} กิโลเมตร
-                  </Typography>
-                </Box>
-
-                {/* Reset Button */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                  <Button
-                    variant="contained"
-                    onClick={handleReset}
-                    sx={{
-                      borderRadius: 25,
-                      px: 6,
-                      py: 1.5,
-                      backgroundColor: '#003f88',
-                      '&:hover': {
-                        backgroundColor: '#002d63',
-                      },
-                      width: '80%',
-                      fontSize: '2rem',
-                      fontWeight: 500,
-                      textTransform: 'none',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    รีเซ็ต <img src="/neta-arrow.svg" alt="NETA" style={{ height: '50px', marginLeft: '8px' }} />
-                  </Button>
-                </Box>
-              </Box>
+              </Button>
+            </Box>
+          </Box>
             )}
           </Box>
-        </Paper>{/* Car Image Section with Animation */}
+        </Paper>
+
+        {/* Car Image Section with Animation */}
         <Box 
           sx={{ 
             flexGrow: 1, 
@@ -576,9 +642,10 @@ function ChargingCalculator() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'flex-end',
+            justifyContent: isLandscape && isMobile ? 'center' : 'flex-end',
             position: 'relative',
-            mb: 4,
+            mb: isMobile ? 2 : 4,
+            mt: isLandscape && isMobile ? 2 : 0,
           }}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
@@ -589,7 +656,7 @@ function ChargingCalculator() {
               position: 'relative',
               width: '100%',
               borderRadius: 8,
-              pt: 2,
+              pt: isLandscape && isMobile ? 0 : 2,
               pb: 1,
               display: 'flex',
               flexDirection: 'column',
@@ -601,9 +668,9 @@ function ChargingCalculator() {
               sx={{
                 color: '#333',
                 fontWeight: 500,
-                fontSize: { xs: '1.2rem', md: '1.5rem' },
+                fontSize: isMobile ? '1rem' : isTablet ? '1rem' : '1.5rem',
                 textAlign: 'center',
-                mb: 2,
+                mb: isMobile ? 1 : 2,
               }}
             >
               {currentCarModel.name}
@@ -619,7 +686,7 @@ function ChargingCalculator() {
                 animate="center"
                 exit="exit"
                 style={{
-                  width: '100%',
+                  width: '80%',
                   display: 'flex',
                   justifyContent: 'center'
                 }}
@@ -629,8 +696,10 @@ function ChargingCalculator() {
                   alt={currentCarModel.name}
                   style={{
                     width: '100%',
-                    maxWidth: '800px',
-                    marginBottom: '20px',
+                    maxWidth: isLandscape && isMobile ? '60%' : '800px',
+                    maxHeight: isLandscape && isMobile ? '30vh' : 'auto',
+                    marginBottom: isMobile ? '10px' : '20px',
+                    objectFit: 'contain'
                   }}
                 />
               </motion.div>
@@ -639,13 +708,19 @@ function ChargingCalculator() {
             {/* Navigation Buttons - Only show when not in result mode */}
             {!isCalculated && (
               <>
-                <Box sx={{ position: 'absolute', bottom: '50%', left: '5%', transform: 'translateY(50%)' }}>
+                <Box sx={{ 
+                  position: 'absolute', 
+                  bottom: '50%', 
+                  left: isMobile ? '2%' : '5%', 
+                  transform: 'translateY(50%)',
+                  zIndex: 2
+                }}>
                   <Button
                     onClick={handlePrevCarModel}
                     sx={{
                       minWidth: 'unset',
-                      width: { xs: '50px', md: '60px' },
-                      height: { xs: '50px', md: '60px' },
+                      width: isMobile ? '30px' : isTablet ? '40px' : '60px',
+                      height: isMobile ? '30px' : isTablet ? '40px' : '60px',
                       p: 0,
                       borderRadius: '50%',
                       backgroundColor: '#EAB142',
@@ -655,17 +730,23 @@ function ChargingCalculator() {
                       },
                     }}
                   >
-                    <ArrowBack sx={{ fontSize: { xs: '1.5rem', md: '2rem' } }} />
+                    <ArrowBack sx={{ fontSize: isMobile ? '1rem' : isTablet ? '1.5rem' : '2rem' }} />
                   </Button>
                 </Box>
                 
-                <Box sx={{ position: 'absolute', bottom: '50%', right: '5%', transform: 'translateY(50%)' }}>
+                <Box sx={{ 
+                  position: 'absolute', 
+                  bottom: '50%', 
+                  right: isMobile ? '2%' : '5%', 
+                  transform: 'translateY(50%)',
+                  zIndex: 2
+                }}>
                   <Button
                     onClick={handleNextCarModel}
                     sx={{
                       minWidth: 'unset',
-                      width: { xs: '50px', md: '60px' },
-                      height: { xs: '50px', md: '60px' },
+                      width: isMobile ? '30px' : isTablet ? '40px' : '60px',
+                      height: isMobile ? '30px' : isTablet ? '40px' : '60px',
                       p: 0,
                       borderRadius: '50%',
                       backgroundColor: '#EAB142',
@@ -675,7 +756,7 @@ function ChargingCalculator() {
                       },
                     }}
                   >
-                    <ArrowForward sx={{ fontSize: { xs: '1.5rem', md: '2rem' } }} />
+                    <ArrowForward sx={{ fontSize: isMobile ? '1rem' : isTablet ? '1.5rem' : '2rem' }} />
                   </Button>
                 </Box>
               </>
@@ -686,10 +767,10 @@ function ChargingCalculator() {
             <Typography
               variant="body2"
               sx={{
-                mt: 2,
+                mt: isMobile ? 1 : 2,
                 color: '#333',
                 fontWeight: 500,
-                fontSize: { xs: '0.9rem', md: '1.1rem', lg: '1.3rem' },
+                fontSize: isMobile ? '0.8rem' : isTablet ? '1rem' : '1rem',
                 textAlign: 'center',
               }}
             >
