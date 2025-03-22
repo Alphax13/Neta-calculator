@@ -181,7 +181,7 @@ function ChargingCalculator() {
     <Box
       sx={{
         minHeight: '100vh',
-        height: isLandscape && isMobile ? 'auto' : '100vh',
+        height: isLandscape && isMobile ? '100vh' : '100vh',
         backgroundImage: `url('/cal.png')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
