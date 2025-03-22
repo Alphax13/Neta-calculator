@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 function ChargingCalculator() {
   const carModels = [
     { model: 'neta-v2', name: 'Neta V II', image: '/neta-car.png', fuelEfficiency: 19.5, electricEfficiency: 18.5, costPerKWh: 4.2, fuelCostPerL: 34.28 },
-    { model: 'neta-x', name: 'Neta X 480', image: '/neta-x.png', fuelEfficiency: 19.5, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 34.28 }
+    { model: 'neta-x', name: 'Neta X', image: '/neta-x.png', fuelEfficiency: 19.5, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 34.28 }
   ];
 
   // Responsive breakpoints
