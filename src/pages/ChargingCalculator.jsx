@@ -7,11 +7,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 function ChargingCalculator() {
   const carModels = [
-    { model: 'neta-v2', name: 'Neta V II', image: '/neta-car.png', fuelEfficiency: 19.5, electricEfficiency: 18.5, costPerKWh: 4.2, fuelCostPerL: 34.28 },
-    { model: 'neta-x', name: 'Neta X', image: '/neta-x.png', fuelEfficiency: 19.5, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 34.28 }
+    { model: 'neta-v2', name: 'Neta V II', image: '/neta-car.png', fuelEfficiency: 18.36, electricEfficiency: 18.5, costPerKWh: 4.2, fuelCostPerL: 34.28 },
+    { model: 'neta-x', name: 'Neta X', image: '/neta-x.png', fuelEfficiency: 14.88, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 34.28 }
   ];
 
-  // Responsive breakpoints
+  // ตรวจสอบขนาดหน้าจอสำหรับการแสดงผลแบบ Responsive
   const isMobile = useMediaQuery('(max-width:600px)');
   const isTablet = useMediaQuery('(max-width:960px)');
   const isLandscape = useMediaQuery('(orientation: landscape)');
@@ -22,15 +22,15 @@ function ChargingCalculator() {
   const [chargingCost, setChargingCost] = useState({ min: 0, max: 0 });
   const [gasCost, setGasCost] = useState({ min: 0, max: 0 });
   const [isCalculated, setIsCalculated] = useState(false);
-  const [slideDirection, setSlideDirection] = useState(0); // -1 for left, 1 for right, 0 for initial
+  const [slideDirection, setSlideDirection] = useState(0); // -1 เลื่อนไปซ้าย, 1 เลื่อนไปขวา, 0 ค่าตั้งต้น
 
   const currentCarModel = carModels[carModelIndex];
 
-  // Handle touch events for car swiping
+  // จัดการการสัมผัสหน้าจอเพื่อเปลี่ยนรุ่นรถ
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
 
-  // Required minimum swipe distance in pixels
+  // ระยะที่ต้องลากขั้นต่ำเพื่อให้ถือว่าเป็นการ swipe (พิกเซล)
   const minSwipeDistance = 50;
 
   const onTouchStart = (e) => {
@@ -52,9 +52,9 @@ function ChargingCalculator() {
     const isRightSwipe = distance < -minSwipeDistance;
     
     if (isLeftSwipe) {
-      handleNextCarModel();
+      handleNextCarModel(); // เลื่อนเลือกรถไปทางขวา
     } else if (isRightSwipe) {
-      handlePrevCarModel();
+      handlePrevCarModel(); // เลื่อนเลือกรถไปทางซ้าย
     }
   };
 
@@ -69,49 +69,53 @@ function ChargingCalculator() {
   };
 
   const handleKilometersChange = (event) => {
-    // Only allow numeric input
+    // อนุญาตให้กรอกเฉพาะตัวเลขเท่านั้น
     const value = event.target.value;
     if (value === '' || /^[0-9]+$/.test(value)) {
       setKilometers(value);
     }
   };
 
-  // Calculate fuel cost
+  // ฟังก์ชันคำนวณค่าน้ำมัน
   const calculateFuel = (distance, efficiency, costPerL) => {
     const fuelConsumed = distance / efficiency;
     return fuelConsumed * costPerL;
   };
 
-  // Calculate electric charging cost
+  // ฟังก์ชันคำนวณค่าไฟฟ้าชาร์จ
   const calculateElectricCost = (distance, efficiency, costPerKWh) => {
     const unitsConsumed = (distance / 100) * efficiency;
     return unitsConsumed * costPerKWh;
   };
 
-  // Round to range
+  // ปัดค่าให้อยู่ในช่วงที่ใกล้เคียงตามช่วงที่กำหนด
   const roundToRange = (value, range) => {
     return `${Math.floor(value / range) * range}-${Math.ceil(value / range) * range}`;
+  };
+
+  // ถ้าค่าน้อยกว่า 100 แสดงค่าจริง ถ้ามากกว่าหรือเท่ากับ 100 ให้แสดงเป็นช่วง
+  const formatCostDisplay = (value, range) => {
+    if (value < 100) {
+      const rounded = value.toFixed(2);
+      return { min: rounded, max: rounded };
+    } else {
+      const [min, max] = roundToRange(value, range).split('-');
+      return { min, max };
+    }
   };
 
   const handleCalculate = () => {
     const km = parseFloat(kilometers);
     if (!isNaN(km) && km > 0) {
-      // Calculate fuel cost
+      // คำนวณค่าน้ำมัน
       const fuelCost = calculateFuel(km, currentCarModel.fuelEfficiency, currentCarModel.fuelCostPerL);
 
-      // Calculate electric charging cost
+      // คำนวณค่าไฟฟ้าสำหรับชาร์จ
       const electricCost = calculateElectricCost(km, currentCarModel.electricEfficiency, currentCarModel.costPerKWh);
 
-      // Set charging and gas cost ranges
-      setChargingCost({
-        min: roundToRange(electricCost, 100).split('-')[0],
-        max: roundToRange(electricCost, 100).split('-')[1]
-      });
-
-      setGasCost({
-        min: roundToRange(fuelCost, 100).split('-')[0],
-        max: roundToRange(fuelCost, 100).split('-')[1]
-      });
+      // ใช้ formatCostDisplay เพื่อแสดงค่าจริงหากน้อยกว่า 100 บาท
+      setChargingCost(formatCostDisplay(electricCost, 100));
+      setGasCost(formatCostDisplay(fuelCost, 100));
 
       setExpanded(true);
       setIsCalculated(true);
@@ -138,12 +142,12 @@ function ChargingCalculator() {
     }
   };
 
-  // Handler for back button click
+  // ฟังก์ชันเมื่อกดปุ่มย้อนกลับ
   const handleBackClick = () => {
     window.location.href = '/';
   };
 
-  // Variants for the car image animation
+  // ตัวเลือกการเคลื่อนไหวของภาพรถ (ถ้ามี framer-motion)
   const carVariants = {
     enter: (direction) => ({
       x: direction > 0 ? 300 : -300,
@@ -346,10 +350,11 @@ function ChargingCalculator() {
                   value={kilometers}
                   onChange={handleKilometersChange}
                   placeholder="กิโลเมตร"
-                  type="text"
+                  type="number"  // เปลี่ยนเป็น type="number" เพื่อให้รองรับการกรอกตัวเลข
                   inputProps={{
                     inputMode: 'numeric',
-                    pattern: '[0-9]*'
+                    pattern: '[0-9]*',
+                    min: 10  // เพิ่ม min เพื่อกำหนดค่าขั้นต่ำที่ 10
                   }}
                   sx={{
                     mb: isMobile ? 3 : 4,
@@ -491,7 +496,9 @@ function ChargingCalculator() {
                   textAlign: 'right',
                 }}
               >
-                {chargingCost.min}-{chargingCost.max}
+                {chargingCost.min === chargingCost.max
+                  ? `${chargingCost.min}`
+                  : `${chargingCost.min}-${chargingCost.max}`}
               </Typography>
               <Typography sx={{ 
                 fontSize: isMobile ? '0.8rem' : '2rem', 
@@ -544,7 +551,9 @@ function ChargingCalculator() {
                   textAlign: 'right',
                 }}
               >
-                {gasCost.min}-{gasCost.max}
+                {gasCost.min === gasCost.max
+                  ? `${gasCost.min}`
+                  : `${gasCost.min}-${gasCost.max}`}
               </Typography>
               <Typography sx={{ 
                 fontSize: isMobile ? '0.8rem' : '2rem', 
