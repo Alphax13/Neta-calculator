@@ -142,7 +142,7 @@ function HomePage() {
           src="/neta-logo.png" 
           alt="NETA Logo" 
           style={{ 
-            height: isMobile ? (isLandscape ? '50px' : '70px') : isTablet ? '80px' : '100px',
+            height: isMobile ? (isLandscape ? '50px' : '60px') : isTablet ? '80px' : '100px',
             transition: 'transform 0.8s ease-out',
             transform: resetAnimation ? 'scale(0.9)' : 'scale(1)'
           }} 
@@ -170,7 +170,7 @@ function HomePage() {
             fontWeight: 400,
             color: '#4A494B',
             mb: isMobile ? 0.5 : 2,
-            fontSize: isMobile ? (isLandscape ? '1.5rem' : '2rem') : isTablet ? '3rem' : '4rem',
+            fontSize: isMobile ? (isLandscape ? '1.5rem' : '1.5rem') : isTablet ? '3rem' : '4rem',
           }}
         >
           ลองเช็กกันไหม ถ้าเราขับ
@@ -196,8 +196,8 @@ function HomePage() {
               src="/steering-wheel.png" 
               alt="Steering wheel" 
               style={{ 
-                width: isMobile ? (isLandscape ? '50px' : '80px') : isTablet ? '100px' : '150px', 
-                height: isMobile ? (isLandscape ? '50px' : '80px') : isTablet ? '100px' : '150px',
+                width: isMobile ? (isLandscape ? '40px' : '50px') : isTablet ? '100px' : '150px', 
+                height: isMobile ? (isLandscape ? '50px' : '50px') : isTablet ? '100px' : '150px',
                 transition: 'transform 0.8s ease-out',
                 transform: resetAnimation ? 'rotate(-45deg)' : 'rotate(0deg)'
               }} 
@@ -211,7 +211,7 @@ function HomePage() {
               fontStyle: 'italic',
               color: '#ff6600',
               display: 'inline',
-              fontSize: isMobile ? (isLandscape ? '3rem' : '5rem') : isTablet ? '8rem' : '12rem',
+              fontSize: isMobile ? (isLandscape ? '2rem' : '4rem') : isTablet ? '8rem' : '12rem',
             }}
           >
             NETA !
@@ -225,7 +225,7 @@ function HomePage() {
             fontWeight: 600,
             color: '#4A494B',
             mb: isMobile ? (isLandscape ? 1 : 2) : isTablet ? 3 : 6,
-            fontSize: isMobile ? (isLandscape ? '2rem' : '3rem') : isTablet ? '4rem' : '6rem',
+            fontSize: isMobile ? (isLandscape ? '2rem' : '2rem') : isTablet ? '4rem' : '6rem',
           }}
         >
           คุ้มค่าแค่ไหน

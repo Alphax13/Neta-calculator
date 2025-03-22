@@ -633,6 +633,26 @@ function ChargingCalculator() {
                 </Box>
               </Button>
             </Box>
+            <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                mt: 2,
+                width: '100%',
+                px: 0, 
+              }}>
+                <Typography 
+                  sx={{ 
+                    fontSize: isMobile ? '0.4rem' : '1.5rem', 
+                    fontWeight: 400, 
+                    textAlign: 'center', 
+                    lineHeight: 1.5, 
+                    color: '#555',
+                    mb: 2,
+                  }}
+                >
+                  คำนวณจากอัตราสิ้นเปลืองยานยนต์ไฟฟ้า 12kwh/100km ถึง 19kwh/100km ทั้งนี้ อัตราสิ้นเปลืองอาจแตกต่างกันไปขึ้นอยู่กับปัจจัยต่างๆ เช่น อุณหภูมิแวดล้อม สภาพแวดล้อม สไตล์การขับขี่ จำนวนผู้โดยสารในรถ เป็นต้น
+                </Typography>
+              </Box>
           </Box>
             )}
           </Box>
