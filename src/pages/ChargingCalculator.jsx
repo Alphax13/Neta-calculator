@@ -311,7 +311,7 @@ function ChargingCalculator() {
                     )}
                     sx={{
                       borderRadius: 1,
-                      height: isMobile ? '40px' : '100px',
+                      height: isMobile ? '20px' : '100px',
                       '& .MuiOutlinedInput-notchedOutline': {
                         borderColor: '#ddd',
                       },
@@ -338,7 +338,7 @@ function ChargingCalculator() {
                     mb: 1,
                     fontWeight: 500,
                     color: '#555',
-                    fontSize: isMobile ? '1rem' : isTablet ? '1rem' : '2rem',
+                    fontSize: isMobile ? '1rem' : isTablet ? '1.8rem' : '2rem',
                   }}
                 >
                   กิโลเมตรต่อวัน
