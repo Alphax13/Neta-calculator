@@ -7,8 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 function ChargingCalculator() {
   const carModels = [
-    { model: 'neta-v2', name: 'Neta V II', image: '/neta-car.png', fuelEfficiency: 18.36, electricEfficiency: 18.5, costPerKWh: 4.2, fuelCostPerL: 34.28 },
-    { model: 'neta-x', name: 'Neta X', image: '/neta-x.png', fuelEfficiency: 14.88, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 34.28 }
+    { model: 'neta-v2', name: 'Neta V II', image: '/neta-car.png', fuelEfficiency: 18.36, electricEfficiency: 14.2, costPerKWh: 4.2, fuelCostPerL: 34.28 },
+    { model: 'neta-x', name: 'Neta X', image: '/neta-x.png', fuelEfficiency: 14.88, electricEfficiency: 18.5, costPerKWh: 4.2, fuelCostPerL: 34.28 }
   ];
 
   // ตรวจสอบขนาดหน้าจอสำหรับการแสดงผลแบบ Responsive
