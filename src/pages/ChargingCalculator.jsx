@@ -205,12 +205,12 @@ function ChargingCalculator() {
             backgroundColor: 'rgba(255, 255, 255, 1)',
           },
           zIndex: 10,
-          width: isMobile ? 40 : 48,
-          height: isMobile ? 40 : 48,
+          width: isMobile ? 20 : 48,
+          height: isMobile ? 20 : 48,
         }}
         aria-label="back to homepage"
       >
-        <KeyboardBackspace sx={{ fontSize: isMobile ? '1.5rem' : '2rem', color: '#003f88' }} />
+        <KeyboardBackspace sx={{ fontSize: isMobile ? '1rem' : '2rem', color: '#003f88' }} />
       </IconButton>
 
       <Box
