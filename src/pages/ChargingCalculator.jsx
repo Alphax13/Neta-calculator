@@ -9,12 +9,12 @@ function ChargingCalculator() {
   const carModels = [
     { 
       model: 'neta-v2', 
-      name: 'Neta V II', 
+      name: 'Neta V - II', 
       image: '/neta-car.png', 
-      fuelEfficiencyMin: 11, 
-      fuelEfficiencyMax: 20, 
-      electricEfficiencyMin: 11, 
-      electricEfficiencyMax: 19, 
+      fuelEfficiencyMin: 11,  // อัตราสิ้นเปลืองน้ำมันต่ำสุด (km/L)
+      fuelEfficiencyMax: 20,  // อัตราสิ้นเปลืองน้ำมันสูงสุด (km/L)
+      electricEfficiencyMin: 11,  // อัตราสิ้นเปลืองไฟฟ้าต่ำสุด (kWh/100km)
+      electricEfficiencyMax: 20,  // อัตราสิ้นเปลืองไฟฟ้าสูงสุด (kWh/100km)
       costPerKWh: 2.9709, 
       fuelCostPerL: 34.28 
     },
@@ -25,7 +25,7 @@ function ChargingCalculator() {
       fuelEfficiencyMin: 11, 
       fuelEfficiencyMax: 20, 
       electricEfficiencyMin: 11, 
-      electricEfficiencyMax: 19, 
+      electricEfficiencyMax: 20, 
       costPerKWh: 2.9709, 
       fuelCostPerL: 34.28 
     }
@@ -298,7 +298,7 @@ function ChargingCalculator() {
           elevation={3}
           sx={{
             height: 'auto', // Changed from '100%' to 'auto'
-            width: '80%',
+            width: '90%',
             maxWidth: '800px',
             borderRadius: 4,
             mb: isMobile ? 2 : 4,
@@ -369,7 +369,7 @@ function ChargingCalculator() {
                     fontSize: isMobile ? '1rem' : isTablet ? '1.8rem' : '2rem',
                   }}
                 >
-                  กิโลเมตรต่อวัน
+                  ระยะทางการขับขี่
                 </Typography>
 
                 <TextField
@@ -439,17 +439,6 @@ function ChargingCalculator() {
             ) : (
               // Results display section
           <Box sx={{ textAlign: 'center', py: isMobile ? 0 : 2, }}>
-            <Typography 
-              sx={{ 
-                fontSize: isMobile ? '1rem' : '2rem', 
-                fontWeight: 500, 
-                mb: 1,
-                textAlign: 'left',
-                px: 2,
-              }}
-            >
-              เลือกรุ่น
-            </Typography>
 
             <Box 
               sx={{ 
@@ -471,17 +460,6 @@ function ChargingCalculator() {
               </Typography>
             </Box>
 
-            <Typography 
-              sx={{ 
-                fontSize: isMobile ? '1rem' : '2rem', 
-                fontWeight: 500,
-                mb: 1,
-                textAlign: 'left',
-                px: 2,
-              }}
-            >
-              ค่าชาร์จไฟ
-            </Typography>
 
             <Box 
               sx={{ 
@@ -492,7 +470,7 @@ function ChargingCalculator() {
                 display: 'flex',
                 alignItems: 'center',
                 px: isMobile ? 2 : 4,
-                mb: isMobile ? 1 : 3,
+                mb: isMobile ? 1 : 1,
                 backgroundColor: '#f8f8f8',
                 mx: 'auto',
               }}
@@ -506,7 +484,7 @@ function ChargingCalculator() {
                 }} 
               />
               <Typography sx={{ 
-                fontSize: isMobile ? '1rem' : '2rem', 
+                fontSize: isMobile ? '1rem' : '1.5rem', 
                 mr: 1, 
                 whiteSpace: 'nowrap',
                 flexShrink: 0
@@ -531,10 +509,16 @@ function ChargingCalculator() {
                 whiteSpace: 'nowrap',
                 flexShrink: 0
               }}>
-                /บาท
+                /ต่อบาท*
               </Typography>
             </Box>
-
+            <Typography sx={{ 
+                fontSize: isMobile ? '0.8rem' : '1.5rem', 
+                whiteSpace: 'nowrap',
+                flexShrink: 0
+              }}>
+                มิเตอร์ TOU ช่วงเวลา Off-peak*
+              </Typography>
             <Box 
               sx={{ 
                 width: '90%', 
@@ -544,7 +528,7 @@ function ChargingCalculator() {
                 display: 'flex',
                 alignItems: 'center',
                 px: isMobile ? 2 : 4,
-                mb: isMobile ? 1 : 3,
+                mb: isMobile ? 1 : 1,
                 backgroundColor: '#f8f8f8',
                 mx: 'auto',
               
@@ -559,7 +543,7 @@ function ChargingCalculator() {
                 }} 
               />
               <Typography sx={{ 
-                fontSize: isMobile ? '1rem' : '2rem', 
+                fontSize: isMobile ? '1rem' : '1.5rem', 
                 mr: 1, 
                 whiteSpace: 'nowrap',
                 flexShrink: 0
@@ -584,7 +568,7 @@ function ChargingCalculator() {
                 whiteSpace: 'nowrap',
                 flexShrink: 0
               }}>
-                /บาท
+                /ต่อบาท**
               </Typography>
             </Box>
 
@@ -666,7 +650,7 @@ function ChargingCalculator() {
               }}>
                 <Typography 
                   sx={{ 
-                    fontSize: isMobile ? '0.4rem' : '1rem', 
+                    fontSize: isMobile ? '0.4rem' : '0.8rem', 
                     fontWeight: 400, 
                     textAlign: 'center', 
                     lineHeight: 1.5, 
@@ -674,8 +658,32 @@ function ChargingCalculator() {
                     mb: 2,
                   }}
                 >
-                  คำนวณจากอัตราสิ้นเปลืองยานยนต์ไฟฟ้า 11kwh/100km ถึง 19kwh/100km ทั้งนี้ อัตราสิ้นเปลืองอาจแตกต่างกันไปขึ้นอยู่กับปัจจัยต่างๆ เช่น อุณหภูมิแวดล้อม สภาพแวดล้อม สไตล์การขับขี่ จำนวนผู้โดยสารในรถ เป็นต้น
+                  * คำนวณจาก ค่าไฟฟ้ามิเตอร์ TOU ช่วงเวลา Off-peak อัตราค่าไฟเดือนมีนาคม 2568 ค่าไฟฟ้าหน่วยละ 2.6037 บาท ค่า ft 0.3672 บาท (ยังไม่รวมค่าใช้จ่ายอื่น ๆ เช่น ค่าบริการมิเตอร์, การใช้จ่ายในการติดตั้งมิเตอร์ TOU, ภาษีมูลค่าเพิ่ม, ภาษีอื่นๆ เป็นต้น)  
+                  โดยคำนวณจากการใช้อัตราสิ้นเปลือง 11 kWh/100 กิโลเมตร ถึง 20 kWh/100 กิโลเมตร ซึ่งอัตราการสิ้นเปลืองในการใช้งานจริงอาจแตกต่างกันไปขึ้นอยู่กับหลากหลายปัจจัย เช่น ความเร็ว อัตราเร่ง จำนวนน้ำหนักบรรทุกในรถ สไตล์การขับขี่แต่ละบุคคล อุณหภูมิ สภาวะแวดล้อมภายนอก เป็นต้น 
+                  การคำนวณนี้เป็นการประมาณค่าพลังงานเบื้องต้นเท่านั้น การใช้งานจริงอาจมีค่าใช้จ่าย น้อยกว่าหรือมากกว่าตัวเลขด้านบน หรืออาจมีค่าใช้จ่ายอื่น ๆ เพิ่มเติมได้ 
                 </Typography>
+              </Box>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                mt: 2,
+                width: '100%',
+                px: 0, 
+              }}>
+                <Typography 
+                  sx={{ 
+                    fontSize: isMobile ? '0.4rem' : '0.8rem', 
+                    fontWeight: 400, 
+                    textAlign: 'center', 
+                    lineHeight: 1.5, 
+                    color: '#555',
+                    mb: 2,
+                  }}
+                >
+                  ** คำนวณจาก ค่าน้ำมันแก๊สโซฮอลล์ 91 ราคา 34.28 บาท ณ วันที่ 22 มีนาคม 2568 (ยังไม่รวมค่าใช้จ่าย อื่นๆ ถ้าหากมี เช่น ค่าบริการ เป็นต้น) 
+โดยคำนวณจากการใช้อัตราสิ้นเปลือง 11 กิโลเมตร / 1 ลิตร ถึง 20 กิโลเมตร / 1 ลิตร ซึ่งอัตราการสิ้นเปลืองในการใช้งานจริงอาจแตกต่างกันไป ซึ่งอาจน้อยกว่าหรือมากกว่า 11 กิโลเมตร / 1 ลิตร ถึง 20 กิโลเมตร / 1 ลิตร ขึ้นอยู่กับหลากหลายปัจจัย เช่น อัตราการสิ้นเปลืองเฉพาะตัวของรถยนต์ในแต่ละรุ่น ขนาดของเครื่องยนต์ ความเร็ว อัตราเร่ง จำนวนน้ำหนักบรรทุกในรถ สไตล์การขับขี่แต่ละบุคคล อุณหภูมิ สภาวะแวดล้อมภายนอก เป็นต้น 
+การคำนวณนี้เป็นการประมาณค่าพลังงานเบื้องต้นเท่านั้น การใช้งานจริงอาจมีค่าใช้จ่าย น้อยกว่าหรือมากกว่าตัวเลขด้านบน หรืออาจมีค่าใช้จ่ายอื่น ๆ เพิ่มเติมได้ 
+                  </Typography>
               </Box>
           </Box>
             )}

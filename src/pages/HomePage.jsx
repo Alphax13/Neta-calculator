@@ -20,8 +20,8 @@ function HomePage() {
   
   // Car models array - limited to the two specified models
   const carModels = [
-    { image: '/neta-car.png', name: 'NETA V-II' },
-    { image: '/neta-x.png', name: 'NETA X' },
+    { image: '/neta-car.png', name: 'NETA V-II', das: 'Your True Value City EV' },
+    { image: '/neta-x.png', name: 'NETA X', das: 'My 1st Electric SUV' },
   ];
 
   // Function to reset and restart animations with car transition
@@ -408,7 +408,7 @@ function HomePage() {
                 display: isMobile && isLandscape ? 'none' : 'block', // Hide in mobile landscape
               }}
             >
-              {carModels[currentCarIndex].name}, Your True Value City EV
+              {carModels[currentCarIndex].name}, {carModels[currentCarIndex].das}
             </Typography>
           </Box>
 
