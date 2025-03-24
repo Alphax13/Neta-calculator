@@ -9,7 +9,7 @@ function ChargingCalculator() {
   const carModels = [
     { 
       model: 'neta-v2', 
-      name: 'Neta V - II', 
+      name: 'NETA V-II', 
       image: '/neta-car.png', 
       fuelEfficiencyMin: 11,  // อัตราสิ้นเปลืองน้ำมันต่ำสุด (km/L)
       fuelEfficiencyMax: 20,  // อัตราสิ้นเปลืองน้ำมันสูงสุด (km/L)
@@ -20,7 +20,7 @@ function ChargingCalculator() {
     },
     { 
       model: 'neta-x', 
-      name: 'Neta X', 
+      name: 'NETA X', 
       image: '/neta-x.png', 
       fuelEfficiencyMin: 11, 
       fuelEfficiencyMax: 20, 
@@ -38,6 +38,7 @@ function ChargingCalculator() {
   
   const [carModelIndex, setCarModelIndex] = useState(0);
   const [kilometers, setKilometers] = useState('');
+  const [displayKilometers, setDisplayKilometers] = useState(''); // สำหรับแสดงผลในรูปแบบที่มีคอมม่า
   const [expanded, setExpanded] = useState(false);
   const [chargingCostMin, setChargingCostMin] = useState(0);
   const [chargingCostMax, setChargingCostMax] = useState(0);
@@ -90,11 +91,24 @@ function ChargingCalculator() {
     }
   };
 
+  // ฟังก์ชันแปลงตัวเลขให้มีคอมม่า
+  const formatNumberWithCommas = (number) => {
+    return Math.round(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
   const handleKilometersChange = (event) => {
     // อนุญาตให้กรอกเฉพาะตัวเลขเท่านั้น
-    const value = event.target.value;
+    const value = event.target.value.replace(/,/g, ''); // ลบคอมม่าออกก่อน
+    
     if (value === '' || /^[0-9]+$/.test(value)) {
-      setKilometers(value);
+      setKilometers(value); // เก็บค่าไว้โดยไม่มีคอมม่า
+      
+      // แปลงเป็นรูปแบบที่มีคอมม่าสำหรับการแสดงผล
+      if (value) {
+        setDisplayKilometers(formatNumberWithCommas(value));
+      } else {
+        setDisplayKilometers('');
+      }
     }
   };
 
@@ -139,11 +153,11 @@ function ChargingCalculator() {
         currentCarModel.costPerKWh
       );
       
-      // เก็บค่าที่คำนวณได้โดยตรง แทนการปัดเศษ
-      setChargingCostMin(electricCost.min.toFixed(2));
-      setChargingCostMax(electricCost.max.toFixed(2));
-      setGasCostMin(fuelCost.min.toFixed(2));
-      setGasCostMax(fuelCost.max.toFixed(2));
+      // จัดรูปแบบตัวเลขและเก็บค่าที่คำนวณ โดยปัดเศษเป็นจำนวนเต็ม และใส่คอมม่า
+      setChargingCostMin(formatNumberWithCommas(electricCost.min));
+      setChargingCostMax(formatNumberWithCommas(electricCost.max));
+      setGasCostMin(formatNumberWithCommas(fuelCost.min));
+      setGasCostMax(formatNumberWithCommas(fuelCost.max));
 
       setExpanded(true);
       setIsCalculated(true);
@@ -152,6 +166,7 @@ function ChargingCalculator() {
 
   const handleReset = () => {
     setKilometers('');
+    setDisplayKilometers('');
     setExpanded(false);
     setIsCalculated(false);
   };
@@ -265,7 +280,7 @@ function ChargingCalculator() {
             display: 'flex', 
             alignItems: 'center', 
             mb: isMobile ? 1 : 1, 
-            pt: isMobile ? 3 : isTablet ? 10 : 10,
+            pt: isMobile ? 3 : isTablet ? 10 : 5,
             cursor: 'pointer',
           }}
           onClick={() => window.open('https://www.neta.co.th/th', '_blank')}
@@ -299,14 +314,14 @@ function ChargingCalculator() {
           sx={{
             height: 'auto', // Changed from '100%' to 'auto'
             width: '90%',
-            maxWidth: '800px',
+            maxWidth: '850px',
             borderRadius: 4,
-            mb: isMobile ? 2 : 4,
+            mb: isMobile ? 2 : 2,
           }}
         >
           <Box
             sx={{
-              p: isMobile ? 2 : 4,
+              p: isMobile ? 2 : 2,
               backgroundColor: 'white',
             }}
           >
@@ -359,7 +374,7 @@ function ChargingCalculator() {
                   </Select>
                 </FormControl>
 
-                {/* Kilometers Input - Only allow numbers */}
+                {/* Kilometers Input - With Comma formatting */}
                 <Typography
                   variant="body1"
                   sx={{
@@ -375,14 +390,12 @@ function ChargingCalculator() {
                 <TextField
                   fullWidth
                   variant="outlined"
-                  value={kilometers}
+                  value={displayKilometers} 
                   onChange={handleKilometersChange}
                   placeholder="กิโลเมตร"
-                  type="number"  // เปลี่ยนเป็น type="number" เพื่อให้รองรับการกรอกตัวเลข
                   inputProps={{
                     inputMode: 'numeric',
-                    pattern: '[0-9]*',
-                    min: 10  // เพิ่ม min เพื่อกำหนดค่าขั้นต่ำที่ 10
+                    min: 10
                   }}
                   sx={{
                     mb: isMobile ? 3 : 4,
@@ -453,7 +466,7 @@ function ChargingCalculator() {
               }}
             >
               <Typography sx={{ 
-                fontSize: isMobile ? '1rem' : '2.5rem',
+                fontSize: isMobile ? '1rem' : '2rem',
                 padding: '0 8px',
               }}>
                 {currentCarModel.name}
@@ -470,7 +483,7 @@ function ChargingCalculator() {
                 display: 'flex',
                 alignItems: 'center',
                 px: isMobile ? 2 : 4,
-                mb: isMobile ? 1 : 1,
+                mb: isMobile ? 0 : 0,
                 backgroundColor: '#f8f8f8',
                 mx: 'auto',
               }}
@@ -485,7 +498,7 @@ function ChargingCalculator() {
               />
               <Typography sx={{ 
                 fontSize: isMobile ? '1rem' : '1.5rem', 
-                mr: 1, 
+                mr: 0, 
                 whiteSpace: 'nowrap',
                 flexShrink: 0
               }}>
@@ -509,13 +522,14 @@ function ChargingCalculator() {
                 whiteSpace: 'nowrap',
                 flexShrink: 0
               }}>
-                /ต่อบาท*
+                บาท*
               </Typography>
             </Box>
             <Typography sx={{ 
-                fontSize: isMobile ? '0.8rem' : '1.5rem', 
+                fontSize: isMobile ? '0.8rem' : '1rem', 
                 whiteSpace: 'nowrap',
-                flexShrink: 0
+                flexShrink: 0,
+                mb: isMobile ? 1 : 2,
               }}>
                 มิเตอร์ TOU ช่วงเวลา Off-peak*
               </Typography>
@@ -568,7 +582,7 @@ function ChargingCalculator() {
                 whiteSpace: 'nowrap',
                 flexShrink: 0
               }}>
-                /ต่อบาท**
+                บาท**
               </Typography>
             </Box>
 
@@ -600,7 +614,7 @@ function ChargingCalculator() {
                 fontSize: isMobile ? '1.2rem' : '2.5rem',
                 padding: '0 8px',
               }}>
-                {kilometers} กิโลเมตร
+                {formatNumberWithCommas(kilometers)} กิโลเมตร
               </Typography>
             </Box>
 
@@ -655,11 +669,11 @@ function ChargingCalculator() {
                     textAlign: 'center', 
                     lineHeight: 1.5, 
                     color: '#555',
-                    mb: 2,
+                    mb: 0,
                   }}
                 >
-                  * คำนวณจาก ค่าไฟฟ้ามิเตอร์ TOU ช่วงเวลา Off-peak อัตราค่าไฟเดือนมีนาคม 2568 ค่าไฟฟ้าหน่วยละ 2.6037 บาท ค่า ft 0.3672 บาท (ยังไม่รวมค่าใช้จ่ายอื่น ๆ เช่น ค่าบริการมิเตอร์, การใช้จ่ายในการติดตั้งมิเตอร์ TOU, ภาษีมูลค่าเพิ่ม, ภาษีอื่นๆ เป็นต้น)  
-                  โดยคำนวณจากการใช้อัตราสิ้นเปลือง 11 kWh/100 กิโลเมตร ถึง 20 kWh/100 กิโลเมตร ซึ่งอัตราการสิ้นเปลืองในการใช้งานจริงอาจแตกต่างกันไปขึ้นอยู่กับหลากหลายปัจจัย เช่น ความเร็ว อัตราเร่ง จำนวนน้ำหนักบรรทุกในรถ สไตล์การขับขี่แต่ละบุคคล อุณหภูมิ สภาวะแวดล้อมภายนอก เป็นต้น 
+                  * คำนวณจาก <strong>ค่าไฟฟ้ามิเตอร์ TOU ช่วงเวลา Off-peak อัตราค่าไฟเดือนมีนาคม 2568</strong> ค่าไฟฟ้าหน่วยละ 2.6037 บาท ค่า ft 0.3672 บาท (ยังไม่รวมค่าใช้จ่ายอื่น ๆ เช่น ค่าบริการมิเตอร์, การใช้จ่ายในการติดตั้งมิเตอร์ TOU, ภาษีมูลค่าเพิ่ม, ภาษีอื่นๆ เป็นต้น)  
+                <br/>  โดยคำนวณจากการใช้อัตราสิ้นเปลือง <strong>11 kWh/100 กิโลเมตร ถึง 20 kWh/100 กิโลเมตร</strong> ซึ่งอัตราการสิ้นเปลืองในการใช้งานจริงอาจแตกต่างกันไปขึ้นอยู่กับหลากหลายปัจจัย เช่น ความเร็ว อัตราเร่ง จำนวนน้ำหนักบรรทุกในรถ สไตล์การขับขี่แต่ละบุคคล อุณหภูมิ สภาวะแวดล้อมภายนอก เป็นต้น 
                   การคำนวณนี้เป็นการประมาณค่าพลังงานเบื้องต้นเท่านั้น การใช้งานจริงอาจมีค่าใช้จ่าย น้อยกว่าหรือมากกว่าตัวเลขด้านบน หรืออาจมีค่าใช้จ่ายอื่น ๆ เพิ่มเติมได้ 
                 </Typography>
               </Box>
@@ -680,9 +694,9 @@ function ChargingCalculator() {
                     mb: 2,
                   }}
                 >
-                  ** คำนวณจาก ค่าน้ำมันแก๊สโซฮอลล์ 91 ราคา 34.28 บาท ณ วันที่ 22 มีนาคม 2568 (ยังไม่รวมค่าใช้จ่าย อื่นๆ ถ้าหากมี เช่น ค่าบริการ เป็นต้น) 
-โดยคำนวณจากการใช้อัตราสิ้นเปลือง 11 กิโลเมตร / 1 ลิตร ถึง 20 กิโลเมตร / 1 ลิตร ซึ่งอัตราการสิ้นเปลืองในการใช้งานจริงอาจแตกต่างกันไป ซึ่งอาจน้อยกว่าหรือมากกว่า 11 กิโลเมตร / 1 ลิตร ถึง 20 กิโลเมตร / 1 ลิตร ขึ้นอยู่กับหลากหลายปัจจัย เช่น อัตราการสิ้นเปลืองเฉพาะตัวของรถยนต์ในแต่ละรุ่น ขนาดของเครื่องยนต์ ความเร็ว อัตราเร่ง จำนวนน้ำหนักบรรทุกในรถ สไตล์การขับขี่แต่ละบุคคล อุณหภูมิ สภาวะแวดล้อมภายนอก เป็นต้น 
-การคำนวณนี้เป็นการประมาณค่าพลังงานเบื้องต้นเท่านั้น การใช้งานจริงอาจมีค่าใช้จ่าย น้อยกว่าหรือมากกว่าตัวเลขด้านบน หรืออาจมีค่าใช้จ่ายอื่น ๆ เพิ่มเติมได้ 
+                  ** คำนวณจาก <strong>ค่าน้ำมันแก๊สโซฮอลล์ 91 ราคา 34.28 บาท</strong> ณ วันที่ 22 มีนาคม 2568 (ยังไม่รวมค่าใช้จ่าย อื่นๆ) 
+                 <br/>โดยคำนวณจากการใช้อัตราสิ้นเปลือง <strong>11 กิโลเมตร / 1 ลิตร ถึง 20 กิโลเมตร / 1 ลิตร ซึ่งอัตราการสิ้นเปลืองในการใช้งานจริงอาจแตกต่างกันไป</strong> ซึ่งอาจน้อยกว่าหรือมากกว่า 11 กิโลเมตร / 1 ลิตร ถึง 20 กิโลเมตร / 1 ลิตร ขึ้นอยู่กับหลากหลายปัจจัย เช่น อัตราการสิ้นเปลืองเฉพาะตัวของรถยนต์ในแต่ละรุ่น ขนาดของเครื่องยนต์ ความเร็ว อัตราเร่ง จำนวนน้ำหนักบรรทุกในรถ สไตล์การขับขี่แต่ละบุคคล อุณหภูมิ สภาวะแวดล้อมภายนอก เป็นต้น 
+                  การคำนวณนี้เป็นการประมาณค่าพลังงานเบื้องต้นเท่านั้น การใช้งานจริงอาจมีค่าใช้จ่าย น้อยกว่าหรือมากกว่าตัวเลขด้านบน หรืออาจมีค่าใช้จ่ายอื่น ๆ เพิ่มเติมได้ 
                   </Typography>
               </Box>
           </Box>
@@ -701,7 +715,7 @@ function ChargingCalculator() {
             alignItems: 'center',
             justifyContent: isLandscape && isMobile ? 'center' : 'flex-end',
             position: 'relative',
-            mb: isMobile ? 2 : 4,
+            mb: isMobile ? 2 : 10,
             mt: isLandscape && isMobile ? 2 : 0,
           }}
           onTouchStart={onTouchStart}
@@ -714,25 +728,12 @@ function ChargingCalculator() {
               width: '100%',
               borderRadius: 8,
               pt: isLandscape && isMobile ? 0 : 2,
-              pb: 1,
+              pb: 10,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{
-                color: '#333',
-                fontWeight: 500,
-                fontSize: isMobile ? '1rem' : '3rem',
-                textAlign: 'center',
-                mb: isMobile ? 1 : 2,
-              }}
-            >
-              {currentCarModel.name}
-            </Typography>
-            
             {/* Animated Car Image */}
             <AnimatePresence initial={false} custom={slideDirection} mode="wait">
               <motion.div
@@ -743,14 +744,13 @@ function ChargingCalculator() {
                 animate="center"
                 exit="exit"
                 style={{
-                  width: '80%',
+                  width: '60%',
                   display: 'flex',
                   justifyContent: 'center'
                 }}
               >
                 <img
                   src={currentCarModel.image}
-                  alt={currentCarModel.name}
                   style={{
                     width: '100%',
                     maxWidth: isLandscape && isMobile ? '60%' : '800px',
